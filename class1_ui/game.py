@@ -1,74 +1,98 @@
 from config import *
 import math
 import pygame
-
-from enemy import Enemy
 from player import Player
+from  enemy import Enemy
+from shed import shed
 
-def execute_game():
+def game_loop():
+    player= Player()
+    current_state= "main"
+
+    while True:
+        if current_state=="main":
+            current_state= execute_game(player)
+        elif current_state== "shed":
+            current_state=shed(player)
+
+
+def execute_game(player:Player):
     """
-     Main function to execute the game loop
+    main function to execute the game loop
     """
-    # Clock for controlling the frame rate
-    clock = pygame.time.Clock()
 
-    # setting up the background:
-    screen = pygame.display.set_mode(resolution)
-    background = pygame.image.load("img/grass.jpg")
-    background = pygame.transform.scale(background, (width, height))
+    #clock for controling the frame rate
+    clock=pygame.time.Clock()
 
-    # Player setup
-    player = Player()
-    player_group = pygame.sprite.Group()
+    #screen background
+    screen= pygame.display.set_mode(resolution)
+    background= pygame.image.load("img/GRASS.jpg")
+    background= pygame.transform.scale(background,(width,height))
+
+    #screen setup
+    screen=pygame.display.set_mode(resolution)
+    pygame.display.set_caption("Endless Wilderness Explorer")
+
+
+    #player setup
+    #player= Player()
+    player_group= pygame.sprite.Group()
     player_group.add(player)
 
-    # Initialize the bullet group
-    bullets = pygame.sprite.Group()
+    #initialize the bullet group
+    bullets= pygame.sprite.Group()
 
-    # Initialize the enemy group
-    enemies = pygame.sprite.Group()
-    enemy_spawn_timer = 0
+    #initialize the enemy group
+    enemies= pygame.sprite.Group()
+    enemy_spawn_timer=0
 
-    running = True
+    running= True
     while running:
-        # Control frame rate
+        #control the fame rate
         clock.tick(fps)
-        # Fill the background
-        screen.blit(background, (0, 0))
+        #fill the background
+        screen.blit(background, (0,0))
 
-        # Event Handling
+        #event handling
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type==pygame.QUIT:
                 pygame.quit()
 
-        # Shooting
+        #shooting
         player.shoot(bullets)
 
-        # Spawning the enemies
-        if enemy_spawn_timer <= 0:
-            new_enemy = Enemy()
+        #spawining the enemies
+        if enemy_spawn_timer <=0:
+            new_enemy= Enemy()
             enemies.add(new_enemy)
-            enemy_spawn_timer = 2 * fps # Every two seconds
+            enemy_spawn_timer= 2*fps #every two seconds
 
-        # Checking for collisions between enemies and bullets
+
+        #checking for the collisions between enemies and bullets
         for bullet in bullets:
-            collided_enemies = pygame.sprite.spritecollide(bullet, enemies, False)
+            collided_enemies= pygame.sprite.spritecollide(bullet, enemies, False)
             for enemy in collided_enemies:
-                enemy.health -= 5  # Decrease health by 5, for example
-                bullet.kill()  # Destroy the bullet
-                if enemy.health <= 0:
-                    enemy.kill()  # Destroy the enemy
+                enemy.health-=5
+                bullet.kill()
+                if enemy.health<=0:
+                    enemy.kill() #destroy the enemy
 
-        # Update the enemy spawn timer
-        enemy_spawn_timer -= 1
 
-        # Update positions
+        #update the enemy spawn timer
+        #enemy_spawn_timer-=1
+
+
+        # update positions
         player_group.update()
         bullets.update()
         enemies.update(player)
 
+        #checking if the user goes into the shed area
+        if player.rect.right>=width:
+            #change the game state to shed
+            return "shed"
 
-        # Drawing the objects
+        #drawing the objects
         player_group.draw(screen)
         enemies.draw(screen)
         for bullet in bullets:

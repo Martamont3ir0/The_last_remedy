@@ -1,8 +1,8 @@
-from bullet import Bullet
+from utils import *
 from config import *
-import pygame
 import math
-
+import pygame
+from bullet import Bullet
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
@@ -10,53 +10,63 @@ class Player(pygame.sprite.Sprite):
         Initialize a Player instance
         """
         super().__init__()
-        # Drawing variables
-        self.image = pygame.Surface(player_size)
+        #drawing variables
+        self.image=pygame.Surface(player_size)
         self.image.fill(blue)
-        self.rect = self.image.get_rect()
-        self.rect.center = (width // 2, height // 2)
+        self.rect= self.image.get_rect()
+        self.rect.center= (width//2, height//2)
 
-        # Gameplay variables
-        self.speed = 5
-        self.health = 100
-        self.bullet_cooldown = 0
+        #gameplay variables
+        self.speed= 5 #multipler for how fast things move
+        self.health= 100
+        self.bullet_cooldown= 0
+
 
     def update(self):
         """
-        Update the position of the player based on keyboard input
+        Update the position of the player based on keyboard input 
         """
-        keys = pygame.key.get_pressed()
-        # Moving upwards
-        if keys[pygame.K_w] and self.rect.top > 0:
+
+        keys= pygame.key.get_pressed()
+        #moving upwards
+        if keys[pygame.K_w] and self.rect.top>0:
             self.rect.y -= self.speed
-        # Moving downwards
-        if keys[pygame.K_s] and self.rect.bottom < height:
+            #its removing because if you are moving upwards you are reducing
+        #moving downwards
+        if keys[pygame.K_s] and self.rect.bottom<height:
             self.rect.y += self.speed
-        # Moving left
-        if keys[pygame.K_a] and self.rect.left > 0:
+        #moving left
+        if keys[pygame.K_a] and self.rect.left>0:
             self.rect.x -= self.speed
-        # Moving right
-        if keys[pygame.K_d] and self.rect.right < width:
+        #moving right
+        if keys[pygame.K_d] and self.rect.right<width:
             self.rect.x += self.speed
 
-    def shoot(self, bullets: pygame.sprite.Group):
+    def shoot(self,bullets:pygame.sprite.Group):
         """
-        Shoot bullets in 4 direction depending on cooldown.
+        Shoot bullets in 4 direction depending on cooldown
 
         Args
         ----
         bullets (pygame.sprite.Group):
-            The bullet group that we will add the news ones to
+            The bullet group that we will add the new ones to
         """
-        # If you're shooting
-        if self.bullet_cooldown <= 0:
-            for angle in [0, math.pi / 2, math.pi, 3 * math.pi / 2]:
-                bullet = Bullet(
+        #if you are shooting
+        if self.bullet_cooldown<=0:
+            for angle in [0, math.pi/2, math.pi,3*math.pi/2]:
+                bullet=Bullet(
                     self.rect.center[0], self.rect.center[1], angle
                 )
                 bullets.add(bullet)
-            self.bullet_cooldown = fps # Frames until the next shot
-        # If you're not
-        self.bullet_cooldown -= 1
+            self.bullet_cooldown= fps  #Frames until the next shot
+        #if you are not
+        self.bullet_cooldown-=1
+
+
+
+
+
+
+
 
 
