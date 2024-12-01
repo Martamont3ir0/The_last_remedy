@@ -115,7 +115,7 @@ def credits_():
     # add background music
 
     # Load your music file
-    pygame.mixer.music.load('audio/Star Wars IV A new hope - Binary Sunset (Force Theme).mp3')
+    pygame.mixer.music.load("audio/Star Wars IV A new hope - Binary Sunset (Force Theme).mp3")
     pygame.mixer.music.play(-1)  # -1 means the music will loop indefinitely
 
     # load the background image
