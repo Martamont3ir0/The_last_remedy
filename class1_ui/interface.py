@@ -67,7 +67,7 @@ def interface():
             # rules button
             if ev.type == pygame.MOUSEBUTTONDOWN:
                 if 90 <= mouse[0] <= 230 and 480 <= mouse[1] <= 540:
-                    under_construction()
+                    rules()
 
 
         # filling the screen
@@ -174,9 +174,96 @@ def credits_():
         # updating the display
         pygame.display.update()
 
-def rules_():
-    print("Displaying rules...")
+def rules():
+    # basic settings #
 
+    screen = pygame.display.set_mode(resolution)
+
+    # load the background image
+
+    story_bg = pygame.image.load('images/backgroundstory.jpg')
+    story_bg = pygame.transform.scale(story_bg, resolution)  # scale the image to match screen resolution
+
+    # Create a semi-transparent overlay
+    overlay = pygame.Surface(resolution, pygame.SRCALPHA)  # Create a surface with alpha channel
+    overlay.fill((0, 0, 0, 128))  # Black with 50% opacity (alpha = 128)
+    # creating the fonts:
+    corbelfont = pygame.font.SysFont("Corbel", 20)
+    comicsansfont = pygame.font.SysFont("Comic Sans MS", 12)
+
+    # main loop to detect user input and displaying the rules page
+
+    while True:
+        # getting the position of the user's mouse
+        mouse = pygame.mouse.get_pos()
+
+        for ev in pygame.event.get():
+
+            # allow the user to quit on (x)
+            if ev.type == pygame.QUIT:
+                pygame.quit()
+
+            # checking if the user clicked the back button
+            if ev.type == pygame.MOUSEBUTTONDOWN:
+                if 450 <= mouse[0] <= 590 and 600 <= mouse[1] <= 660:
+                    interface()
+
+        # displaying my screen
+        screen.fill(deep_black)
+
+        # displaying the background image
+        screen.blit(story_bg, (0, 0))
+        screen.blit(overlay, (0, 0))
+
+        # creating the rendered texts for the story
+        story_text = [
+            "Background Story",
+            "",
+            "The World is Dying.",
+            "It’s 2032. A global catastrophe known as The Burn has torn the world apart.",
+            "Years of environmental abuse and unchecked technological greed have caused Earth’s atmosphere to collapse,",
+            "unleashing deadly solar radiation that scorches the land and turns entire cities to ash. The air is toxic,",
+            "the oceans are poisoned, and humanity teeters on the edge of extinction.","",
+            "But there is a way to save it all.",
+            "The Elixir, a mysterious potion capable of reversing the damage of The Burn,",
+            "was created in secret by an underground government project called The Last Dawn.",
+            "The Elixir can heal the Earth, restore the environment, and stop the radiation from devouring the planet.",
+            "But there’s a catch: the formula is incomplete, and only a single vial remains.",
+            "Without a rare, missing ingredient called Solanum, the Elixir can’t be fully realized.",
+            "",
+            "The International Coalition, the global superpower, controls the remaining vial and plans to use it to consolidate their power.",
+            "They are prepared to do whatever it takes to keep the Elixir under their thumb.",
+            "",
+            "You Are the Last Hope.",
+            "You play as Luca Quinn, a former scientist who once worked on the Elixir project.",
+            "The Coalition shut it down, erased the research, and destroyed your life. ",
+            "Now, after years of hiding, you’ve learned of the missing ingredient—Solanum—and its location deep within the Wastes,",
+            "a desolate region devastated by radiation. If you can retrieve it, you can complete the Elixir and change the world.",
+            "",
+            "But you’re not alone.",
+            "The Coalition’s Sentinels will stop at nothing to prevent you from reaching the plant.",
+            "And there are others—mercenaries, factions, and desperate survivors—who want the Elixir for themselves.",
+            "",
+            "In a dying world, everyone is a potential enemy."
+        ]
+        # displaying our texts
+        i = 10  # Starting y position for text
+        for line in story_text:
+            # Render the line of text
+            rendered_line = comicsansfont.render(line, True, white)
+            # Blit the rendered text onto the screen at the specified position
+            screen.blit(rendered_line, (10, i))
+            # Increment the y position for the next line
+            i += 20  # Increase y position for next line (30 pixels apart)
+
+        # drawing and displaying the back button
+        pygame.draw.rect(screen, dark_red, [450, 600, 140, 60])
+        back_text = corbelfont.render("Back", True, white)
+        back_rect = back_text.get_rect(center=(450 + 140 // 2, 600 + 60 // 2))
+        screen.blit(back_text, back_rect)
+
+        # updating the display
+        pygame.display.update()
 
 def wilderness_explorer():
     game_loop()
