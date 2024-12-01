@@ -7,7 +7,7 @@ from utils import under_construction
 def shed(player):
     # Basic setup
     # setting up the background:
-    background = pygame.image.load("images/farm.png")
+    background = pygame.image.load("class1_ui/img/farm.png")
     background = pygame.transform.scale(background, (width, height))
     screen = pygame.display.set_mode(resolution)
     clock = pygame.time.Clock()
