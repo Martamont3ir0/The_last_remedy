@@ -9,22 +9,29 @@ from bullet import Bullet
 
 
 # making Player a child of the Sprite class
+# need to add bg_width, bg_height and character_image_path as arguments
 class Player(pygame.sprite.Sprite):
-    def __init__(self, bg_width, bg_height):  # CHANGED: Add bg_width and bg_height as arguments
+    def __init__(self, bg_width, bg_height, character_image_path):
         super().__init__()
 
-        # VISUAL VARIABLES
-        self.image = pygame.Surface(player_size)
-        self.image.fill(cute_purple)
-        self.rect = self.image.get_rect()
-        self.rect.center = (width // 2, height // 2)
+        if character_image_path:
+            self.image=pygame.image.load(character_image_path)
+            self.image=pygame.transform.scale(self.image, (50,50))
 
-        # GAMEPLAY VARIABLES
+        else: #creating a purple square as placeholder
+            self.image=pygame.Surface((50,50))
+            self.image.fill(cute_purple)
+
+        self.rect=self.image.get_rect()
+        self.rect.center=(width//2, height//2)
+
+
+        # gameplay variables
         self.speed = 5
         self.health = 100
         self.bullet_cooldown = 0
 
-        # NEW: Store background dimensions
+        # Store background dimensions
         self.bg_width = bg_width
         self.bg_height = bg_height
 
