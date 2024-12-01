@@ -4,48 +4,45 @@ from utils import *
 from utils import under_construction
 
 
-def shed (player):
-    #setup of the background and screen
-    background= pygame.image.load("img/farm.png")
-    background= pygame.transform.scale(background, resolution)
-    screen= pygame.display.set_mode(resolution)
-    clock=pygame.time.Clock()
-
+def shed(player):
+    # Basic setup
+    # setting up the background:
+    background = pygame.image.load("img/farm.png")
+    background = pygame.transform.scale(background, resolution)
+    screen = pygame.display.set_mode(resolution)
+    clock = pygame.time.Clock()
     #set the players position to the left of the screen
-    player.rect.left=0
+    player.rect.left = 0
     player_group= pygame.sprite.Group()
     player_group.add(player)
 
-    special_area=pygame.Rect(530,30,140,140)
+    special_area = pygame.Rect(530, 30, 140, 140)
 
-    running= True
+    running = True
     while running:
         clock.tick(fps)
-        screen.blit(background, (0,0))
+        screen.blit(background, (0, 0))
 
-        #event handling
+        # Event handling
         for event in pygame.event.get():
-            if event.type==pygame.QUIT:
+            if event.type == pygame.QUIT:
                 pygame.quit()
 
-        #update their position
+        # Update the player's position
         player.update()
-
         #detect if the user walks in the special area (House)
         if special_area.colliderect(player.rect):
-            under_construction()
-            #change player position to avoid infinte loo+
-            player.rect.top=200
-            player.rect.left=560
+            under_construction()  # Trigger the under_construction screen
+            player.rect.top = 200  # Reset player position to prevent instant re-trigger
+            player.rect.left = 560
 
-        #allow a player to return to the previous screen
-        if player.rect.left<=0:
+        # Allow returning to the main screen
+        if player.rect.left <= 0:
             #position the player to the right of the screen
-            player.rect.left=width-player.rect.width
-            return "main"
+            player.rect.left = width - player.rect.width
+            return "main"  # Transition back to the main game
 
-        #draw player
-        player_group.draw(screen)
+        # Draw player
+        pygame.draw.rect(screen, cute_purple, player.rect)
 
         pygame.display.flip()
-

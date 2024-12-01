@@ -5,8 +5,9 @@ from player import Player
 from  enemy import Enemy
 from shed import shed
 
+
 def game_loop():
-    player= Player()
+    player= Player(bg_width=width, bg_height=height)
     current_state= "main"
 
     while True:
@@ -26,12 +27,12 @@ def execute_game(player:Player):
 
     #screen background
     screen= pygame.display.set_mode(resolution)
-    background= pygame.image.load("img/GRASS.jpg")
+    background= pygame.image.load("img/backroundscenario.jpg")
     background= pygame.transform.scale(background,(width,height))
 
     #screen setup
     screen=pygame.display.set_mode(resolution)
-    pygame.display.set_caption("Endless Wilderness Explorer")
+    pygame.display.set_caption("The last remedy")
 
 
     #player setup
@@ -99,3 +100,6 @@ def execute_game(player:Player):
             bullet.draw(screen)
 
         pygame.display.flip()
+
+
+

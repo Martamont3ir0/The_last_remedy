@@ -1,66 +1,64 @@
 from utils import *
 from config import *
-import math
 import pygame
+import math
 from bullet import Bullet
 
+
+
+
+
+# making Player a child of the Sprite class
 class Player(pygame.sprite.Sprite):
-    def __init__(self):
-        """
-        Initialize a Player instance
-        """
+    def __init__(self, bg_width, bg_height):  # CHANGED: Add bg_width and bg_height as arguments
         super().__init__()
-        #drawing variables
-        self.image=pygame.Surface(player_size)
-        self.image.fill(blue)
-        self.rect= self.image.get_rect()
-        self.rect.center= (width//2, height//2)
 
-        #gameplay variables
-        self.speed= 5 #multipler for how fast things move
-        self.health= 100
-        self.bullet_cooldown= 0
+        # VISUAL VARIABLES
+        self.image = pygame.Surface(player_size)
+        self.image.fill(cute_purple)
+        self.rect = self.image.get_rect()
+        self.rect.center = (width // 2, height // 2)
 
+        # GAMEPLAY VARIABLES
+        self.speed = 5
+        self.health = 100
+        self.bullet_cooldown = 0
+
+        # NEW: Store background dimensions
+        self.bg_width = bg_width
+        self.bg_height = bg_height
 
     def update(self):
-        """
-        Update the position of the player based on keyboard input 
-        """
+        keys = pygame.key.get_pressed()
 
-        keys= pygame.key.get_pressed()
-        #moving upwards
-        if keys[pygame.K_w] and self.rect.top>0:
+        # CHANGED: Use bg_width and bg_height to restrict movement
+        if keys[pygame.K_w] and self.rect.top > 0:
             self.rect.y -= self.speed
-            #its removing because if you are moving upwards you are reducing
-        #moving downwards
-        if keys[pygame.K_s] and self.rect.bottom<height:
+        if keys[pygame.K_s] and self.rect.bottom < self.bg_height:  # Use bg_height for bottom limit
             self.rect.y += self.speed
-        #moving left
-        if keys[pygame.K_a] and self.rect.left>0:
+        if keys[pygame.K_a] and self.rect.left > 0:
             self.rect.x -= self.speed
-        #moving right
-        if keys[pygame.K_d] and self.rect.right<width:
+        if keys[pygame.K_d] and self.rect.right < self.bg_width:  # Use bg_width for right limit
             self.rect.x += self.speed
 
-    def shoot(self,bullets:pygame.sprite.Group):
+    def shoot(self, bullets):
         """
-        Shoot bullets in 4 direction depending on cooldown
-
-        Args
-        ----
-        bullets (pygame.sprite.Group):
-            The bullet group that we will add the new ones to
+        bullets --> pygame group where I will add bullets
         """
-        #if you are shooting
-        if self.bullet_cooldown<=0:
-            for angle in [0, math.pi/2, math.pi,3*math.pi/2]:
-                bullet=Bullet(
-                    self.rect.center[0], self.rect.center[1], angle
-                )
+        # cooldown ==> how many frames I need to wait until I can shoot again
+        if self.bullet_cooldown <= 0:
+            # === defining the directions in which the bullets will fly ===
+            # these 4 directions are, in order, right, left, up, down
+            for angle in [0, math.pi, math.pi / 2, 3 * math.pi / 2]:
+                bullet = Bullet(self.rect.centerx, self.rect.centery, angle)
                 bullets.add(bullet)
-            self.bullet_cooldown= fps  #Frames until the next shot
-        #if you are not
-        self.bullet_cooldown-=1
+
+            # resetting the cooldown
+            self.bullet_cooldown = fps
+
+        self.bullet_cooldown -= 1
+
+
 
 
 
