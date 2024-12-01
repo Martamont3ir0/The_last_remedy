@@ -32,18 +32,3 @@ class Bullet(pygame.sprite.Sprite):
     def draw(self, screen):
         # drawing the bullet on the screen
         pygame.draw.circle(screen, self.color, self.rect.center, self.radius)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

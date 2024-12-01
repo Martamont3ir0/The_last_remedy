@@ -114,11 +114,12 @@ def credits_():
 
     # add background music
 
-    pygame.mixer.music.load('audio/Star Wars IV A new hope - Binary Sunset (Force Theme).mp3.html')  # Load your music file
+    # Load your music file
+    pygame.mixer.music.load('audio/Star Wars IV A new hope - Binary Sunset (Force Theme).mp3')
     pygame.mixer.music.play(-1)  # -1 means the music will loop indefinitely
 
     # load the background image
-    credits_bg = pygame.image.load('creditsbg.png')
+    credits_bg = pygame.image.load('class1_ui/img/creditsbg.png')
     credits_bg = pygame.transform.scale(credits_bg, resolution)  # scale the image to match screen resolution
 
     # Create a semi-transparent overlay
@@ -133,7 +134,6 @@ def credits_():
     augusto_text = comicsansfont.render("Augusto Santos, ajrsantos@novaims.unl.pt", True, white)
     diogo_text = comicsansfont.render("Diogo Rastreio, drasteiro@novaims.unl.pt", True, white)
     liah_text = comicsansfont.render("Liah Rosenfeld, lrosenfeld@novaims.unl.pt", True, white)
-
 
     # main loop to detect user input and displaying the credits page
 
@@ -180,3 +180,4 @@ def rules_():
 
 def wilderness_explorer():
     game_loop()
+

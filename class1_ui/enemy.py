@@ -18,9 +18,9 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.x = random.randint(0, width - enemy_size[0])
         self.rect.y = random.randint(0, height - enemy_size[-1])
 
-        # setting a random initial speed for the enemy boost  maybe different enemy types would be cool
+        # setting a random initial speed for the enemy booo maybe different enemy types would be cool
         self.speed = random.randint(1, 3)
-        # setting the health bar
+        # setting the healthbar
         self.health = 10
 
     def update(self, player):
