@@ -12,19 +12,22 @@ def interface():
     # creating the screen at the set resolution
     screen = pygame.display.set_mode(resolution) # show the user something
 
+    # set background image for main screen
+    main_background = pygame.image.load('class1_ui/img/main_background_screen.jpg')
+    main_background = pygame.transform.scale(main_background, resolution)  # scale the image to match screen resolution
+
+
     # setting the fonts
     corbelfont = pygame.font.SysFont("Corbel", 50)
     comicsansfont = pygame.font.SysFont("Comic Sans MS", 50)
 
     # render the text (will be used in the game button)
-    wilderness_text = corbelfont.render("Wilderness Explorer", True, white)
+    wilderness_text = corbelfont.render("Start Game ", True, white)
     quit_text = corbelfont.render("quit", True, white)
     rules_text = corbelfont.render("rules", True, white)
     options_text = corbelfont.render("options", True, white)
     credits_text = corbelfont.render("credits", True, white)
     title_text = comicsansfont.render("Computation III - Project", True, glowing_light_red)
-
-
 
 
 
@@ -68,6 +71,10 @@ def interface():
 
         # filling the screen
         screen.fill(deep_black)
+
+        # displaying the background image
+        screen.blit(main_background, (0, 0))
+
 
         # wilderness explorer button
         pygame.draw.rect(screen, dark_red, [90, 240, 540, 60])
