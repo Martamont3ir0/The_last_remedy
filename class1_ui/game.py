@@ -1,9 +1,9 @@
 from enemy import Enemy
 from config import *
+import math
 import pygame
 from player import Player
 from shed import shed
-
 
 def character_selection_screen():
     # Screen setup
@@ -46,16 +46,18 @@ def character_selection_screen():
                 exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if girl_rect.collidepoint(event.pos):
-                    selected_character = "girl"
-                    character_image_path = "class1_ui/img/lucaquinn_female.jpg"
+                    selected_character = "girl"  # Set to "girl"
+                    character_image_path = "lucaquinn_female.jpg"  # Store the image path
                 elif boy_rect.collidepoint(event.pos):
-                    selected_character = "boy"
-                    character_image_path = "class1_ui/img/lucaquinn_male.jpg"
+                    selected_character = "boy"  # Set to "boy"
+                    character_image_path = "lucaquinn_male.jpg"  # Store the image path
 
         pygame.display.flip()
         clock.tick(30)
 
-    return character_image_path  # Return the image path
+    return character_image_path  # Return the image path, not just the character name
+
+
 
 
 def game_loop():
@@ -63,19 +65,15 @@ def game_loop():
     selected_character = character_selection_screen()  # Returns image path
 
     # Debugging: Check if image path was correctly selected
-    print(f"Character image path: {selected_character}")
+    print(f"Character image path: {selected_character}")  # Debugging output
 
     # SETUP:
     # Load the background image and get its size (bg_width, bg_height)
-    background = pygame.image.load("class1_ui/img/backroundscenario.jpg")
-    bg_width, bg_height = background.get_size()
+    background = pygame.image.load("class1_ui/img/backroundscenario.jpg")  # Make sure this path is correct
+    bg_width, bg_height = background.get_size()  # Get the dimensions of the background image
 
-    # Create the player with the selected image path
-    player = Player(bg_width, bg_height, selected_character)
-
-    # Optional: Load animations for the player (if sprite sheet available)
-    # Uncomment this line if you have a sprite sheet
-    # player.load_animation_frames("class1_ui/img/player_sprite_sheet.png", frame_width=50, frame_height=50)
+    # Create the player with the selected image path, and pass bg_width and bg_height
+    player = Player(bg_width, bg_height, selected_character)  # Pass image path directly
 
     current_state = "main"  # Start in the main area
 
@@ -86,46 +84,61 @@ def game_loop():
             current_state = shed(player)
 
 
+
+
+
+
+
+
 def execute_game(player: Player = None, character_image_path=None):
     # SETUP:
-    background = pygame.image.load("class1_ui/img/backroundscenario.jpg")
-    bg_width, bg_height = background.get_size()
 
+    # setting up the background:
+    background = pygame.image.load("class1_ui/img/backroundscenario.jpg")
+    bg_width, bg_height = background.get_size()  # **New Line: Get the original size of the background image**
+
+    # Create the player with the selected character image
     if player is None:
         player = Player(bg_width, bg_height, character_image_path)
 
-    # Clock for frame rate control
+    # using the clock to control the time frame.
     clock = pygame.time.Clock()
 
-    # Screen setup
+    # screen setup:
     screen = pygame.display.set_mode(resolution)
     pygame.display.set_caption("Endless Wilderness Explorer")
 
-    # Create sprite groups
+    # CHANGED: Initialize the player if not already passed
+    if player is None:
+        player = Player(bg_width, bg_height)  # Pass bg_width and bg_height
+
+    # setting up the player
     player_group = pygame.sprite.Group()
     player_group.add(player)
 
     bullets = pygame.sprite.Group()
     enemies = pygame.sprite.Group()
 
-    # Enemy cooldown and background scrolling position
+    # before starting our main loop, setup the enemy cooldown variable
     enemy_cooldown = 0
-    bg_x = 0
+
+    # **New Line: Scroll position for the background**: Track how much the background has moved
+    bg_x = 0  # **New Line: Initial position of the background**
 
     running = True
     while running:
         clock.tick(fps)
 
-        # Handling events
+        screen.blit(background, (0, 0))
+
+        # handling events:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                exit()
 
-        # Shooting (example for auto-shooting)
         player.shoot(bullets)
 
-        # Spawning enemies every two seconds
+        # spawning enemies every two seconds
         if enemy_cooldown <= 0:
             enemy = Enemy()
             enemies.add(enemy)
@@ -133,28 +146,25 @@ def execute_game(player: Player = None, character_image_path=None):
 
         enemy_cooldown -= 1
 
-        # Update all entities
         player_group.update()
-        bullets.update()
         enemies.update(player)
+        bullets.update()
 
-        # Move and draw the background
+        # **Changed Line: Move the background as the player moves to the right**
         bg_x -= player.speed
+
         if bg_x <= -bg_width:
-            bg_x = 0
+            bg_x = 0  # **Changed Line: Reset background position to create seamless looping**
+
         screen.blit(background, (bg_x, 0))
         screen.blit(background, (bg_x + bg_width, 0))
 
-        # Draw all sprites
         player_group.draw(screen)
         enemies.draw(screen)
+
         for bullet in bullets:
             bullet.draw(screen)
 
-        # Draw player health bar
-        player.draw_health_bar(screen)
-
-        # Check collisions between bullets and enemies
         for bullet in bullets:
             collided_enemies = pygame.sprite.spritecollide(bullet, enemies, False)
             for enemy in collided_enemies:
@@ -163,17 +173,10 @@ def execute_game(player: Player = None, character_image_path=None):
                 if enemy.health <= 0:
                     enemy.kill()
 
-        # Transition to the shed if the player reaches the right edge
         if player.rect.right >= width:
             return "shed"
-
         pygame.display.flip()
 
-    # End the game if loop terminates
     pygame.quit()
-
-
-
-
 
 
