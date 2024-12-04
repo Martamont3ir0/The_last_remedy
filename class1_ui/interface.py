@@ -5,10 +5,6 @@ from utils import under_construction
 from PIL import Image
 
 
-
-
-
-
 def interface():
 
     # initiating pygame
@@ -181,7 +177,7 @@ def rules():
 
     # load the background image
 
-    story_bg = pygame.image.load('images/backgroundstory.jpg')
+    story_bg = pygame.image.load('class1_ui/img/backgroundstory.jpg')
     story_bg = pygame.transform.scale(story_bg, resolution)  # scale the image to match screen resolution
 
     # Create a semi-transparent overlay
