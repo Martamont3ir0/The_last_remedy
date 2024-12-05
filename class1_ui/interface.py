@@ -1,8 +1,77 @@
+import pygame
 from game import game_loop
 from utils import *  # no need to import pygame because the import is in utils
 from config import *  # importing colors and the like
 from utils import under_construction
 from PIL import Image
+
+# glowing affect and shadow affect on title
+def glowing_title(screen, title_font, text, position, text_color, glow_color,shadow_color):
+    shadow_offset= 4
+    shadow_surface= title_font.render(text, True, shadow_color)
+    shadow_rect= shadow_surface.get_rect(center=(position[0]+shadow_offset,position[1]+shadow_offset))
+    screen.blit(shadow_surface, shadow_rect.topleft)
+
+    glow_levels= [6,8,10,12] #thickness of layer
+    for level in glow_levels:
+        glow_surface= title_font.render(text, True, glow_color)
+        glow_rect= glow_surface.get_rect(center=position)
+        #large layers
+        glow_surface= pygame.transform.smoothscale(
+            glow_surface,
+            (glow_rect.width+level, glow_rect.height+level)
+        )
+        glow_rect= glow_surface.get_rect(center=position)
+        screen.blit(glow_surface, glow_rect.topleft)
+
+    title_surface= title_font.render(text, True, text_color)
+    title_rect= title_surface.get_rect(center=position)
+    screen.blit(title_surface, title_rect.topleft)
+
+
+
+#trying to implement a function for drawing buttons
+def draw_buttons (screen, text, rect, font,base_color, text_color, hover_color, mouse_pos, border_radius=15, padding=(20,10)):
+    """
+    drawing buttons with rounded corners, text and a hover effect
+    Parameters:
+    -screen: pygame display surface
+    -text: text to display on the button
+    -rect:pygame.Rect object is to define button size and position
+    -font: font for text
+    -base color: color of button
+    -text color: color of text
+    -hover color: color of button when hovered over
+    -mouse pos: tuple of mouse position (x,y)
+    -border radius: radius of rounded corners. Set to default 15
+    -padding: tuple (horizontal, vertical) for text inside the button
+    Returns:
+        -bool: True if the button is clicked
+                False if not
+    """
+    #change the button color when hovered
+    if rect.collidepoint(mouse_pos):
+        button_color= hover_color
+    else:
+        button_color= base_color
+
+    #drawing the rounded rectangle button
+    pygame.draw.rect(screen, button_color, rect, border_radius=border_radius)
+
+    #padded rectangle button
+    padded_rect= rect.inflate(padding[0], padding[1]) #padding to increase size
+    pygame.draw.rect(screen, button_color, padded_rect, border_radius=border_radius)
+
+    #text
+    button_text= font.render(text, True, text_color)
+    text_rect= button_text.get_rect(center=padded_rect.center)
+    screen.blit(button_text, text_rect)
+
+    #return True if clicked
+    return rect.collidepoint(mouse_pos)
+
+
+
 
 
 def interface():
@@ -16,10 +85,14 @@ def interface():
     main_background = pygame.image.load('class1_ui/img/main_background_screen.jpg')
     main_background = pygame.transform.scale(main_background, resolution)  # scale the image to match screen resolution
 
+    #making the background more discrete
+    overlay= pygame.Surface(resolution)
+    overlay.set_alpha(128)
+    overlay.fill((0,0,0))
 
     # setting the fonts
     bookantiqua = pygame.font.SysFont("bookantiqua", 50)
-    title_font = pygame.font.SysFont("bookantiqua", 72)
+    title_font = pygame.font.SysFont("garamond", 80, bold=True, italic=True)
 
     # render the text (will be used in the game button)
     wilderness_text = bookantiqua.render("Start Game ", True, white)
@@ -28,8 +101,6 @@ def interface():
     options_text = bookantiqua.render("options", True, white)
     credits_text = bookantiqua.render("credits", True, white)
 
-    title_text = title_font.render("The last remedy ", True, greenish)
-    title_shadow= title_font.render("The last remedy", True, deep_black)
 
 
     # main interface loop (will run until the user quits)
@@ -44,78 +115,57 @@ def interface():
             if ev.type == pygame.QUIT:
                 pygame.quit()
 
-            # quit button
-            if ev.type == pygame.MOUSEBUTTONDOWN:
-                if 450 <= mouse[0] <= 590 and 600 <= mouse[1] <= 660:
-                    pygame.quit()
-
-            # credits button
-            if ev.type == pygame.MOUSEBUTTONDOWN:
-                if 450 <= mouse[0] <590 and 480 <= mouse[1] <540:
-                    credits_()
-
-            # wilderness game button
-            if ev.type == pygame.MOUSEBUTTONDOWN:
-                if 90 <= mouse[0] <= 630 and 240 <= mouse[1] <= 300:
-                    wilderness_explorer()
-
-            # options button
-            if ev.type == pygame.MOUSEBUTTONDOWN:
-                if 90 <= mouse[0] <= 230 and 600 <= mouse[1] <= 660:
-                    under_construction()
-
-            # rules button
-            if ev.type == pygame.MOUSEBUTTONDOWN:
-                if 90 <= mouse[0] <= 230 and 480 <= mouse[1] <= 540:
-                    rules()
-
 
         # filling the screen
         screen.fill(deep_black)
 
         # displaying the background image
         screen.blit(main_background, (0, 0))
+        screen.blit(overlay, (0,0))
 
-        # avoid shadow overlap
-        shadow_offset_x = 4
-        shadow_offset_y = 4
+        #testing glowing affect
+        glowing_title(
+            screen,
+            title_font,
+            "The Last Remedy",
+            (width//2,100),
+            text_color=deep_black,
+            glow_color=(0,255,0),
+            shadow_color=white
+        )
+        #defining button rectangles
+        start_button_rect = pygame.Rect(90, 240, 540, 60)
+        rules_button_rect = pygame.Rect(90, 480, 140, 60)
+        options_button_rect = pygame.Rect(90, 600, 140, 60)
+        quit_button_rect = pygame.Rect(450, 600, 140, 60)
+        credits_button_rect = pygame.Rect(450, 480, 140, 60)
 
-        #showing title of project with shadow
-        title_rect= title_text.get_rect(center=(width//2,100))
-        shadow_rect= title_shadow.get_rect(center=(width//2+5,105))
-
-
-
-        #shadow and title
-        screen.blit(title_shadow, shadow_rect.topleft)
-        screen.blit(title_text, title_rect.topleft)
-
-
-        # wilderness explorer button
-        pygame.draw.rect(screen, dark_red, [90, 240, 540, 60])
-        wilderness_rect = wilderness_text.get_rect(center=(90 + 540 // 2, 240 + 60 // 2)) # text centered in the button
-        screen.blit(wilderness_text, wilderness_rect)
-
-        # rules button
-        pygame.draw.rect(screen, grey, [90, 480, 140, 60])
-        rules_rect = rules_text.get_rect(center=(90 + 140 // 2, 480 + 60 // 2))  # text centered in the button
-        screen.blit(rules_text, rules_rect)
-
-        # options button
-        pygame.draw.rect(screen, grey, [90, 600, 140, 60])
-        options_rect = options_text.get_rect(center=(90 + 140 // 2, 600 + 60 // 2))  # text centered in the button
-        screen.blit(options_text, options_rect)
-
+        #drawing buttons and taking in consideration the interactions
         # quit button
-        pygame.draw.rect(screen, grey, [450, 600, 140, 60])
-        quit_rect = quit_text.get_rect(center=(450 + 140 // 2, 600 + 60 // 2))  # text centered in the button
-        screen.blit(quit_text, quit_rect)
+        if draw_buttons(screen, "Quit", quit_button_rect, bookantiqua, grey, white, glowing_light_red, mouse):
+            if ev.type == pygame.MOUSEBUTTONDOWN and quit_button_rect.collidepoint(mouse):
+                pygame.quit()
 
         # credits button
-        pygame.draw.rect(screen, grey, [450, 480, 140, 60])
-        credits_rect = credits_text.get_rect(center=(450 + 140 // 2, 480 + 60 // 2))  # text centered in the button
-        screen.blit(credits_text, credits_rect)
+        if draw_buttons(screen, "Credits", credits_button_rect, bookantiqua, grey, white, glowing_light_red, mouse):
+            if ev.type == pygame.MOUSEBUTTONDOWN and credits_button_rect.collidepoint(mouse):
+                credits_()
 
+        # start  game button
+        if draw_buttons(screen, "Start Game", start_button_rect, bookantiqua, dark_red, white, glowing_light_red,
+                        mouse):
+            if ev.type == pygame.MOUSEBUTTONDOWN and start_button_rect.collidepoint(mouse):
+                wilderness_explorer()
+
+        # options button
+        if draw_buttons(screen, "Options", options_button_rect, bookantiqua, grey, white, glowing_light_red, mouse):
+            if ev.type == pygame.MOUSEBUTTONDOWN and options_button_rect.collidepoint(mouse):
+                under_construction()
+
+        # rules button
+        if draw_buttons(screen, "Rules", rules_button_rect, bookantiqua, grey, white, glowing_light_red, mouse):
+            if ev.type == pygame.MOUSEBUTTONDOWN and rules_button_rect.collidepoint(mouse):
+                rules()
 
         # update the display so that the loop changes will appear
         pygame.display.update()
