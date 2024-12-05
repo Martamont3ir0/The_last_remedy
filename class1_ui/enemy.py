@@ -2,16 +2,14 @@ from config import *
 import pygame
 import random
 import math
+from PIL import Image
 
 class Enemy(pygame.sprite.Sprite):
 
     def __init__(self):
         super().__init__()
-        # creating a surface for the enemy
-        self.image = pygame.Surface(enemy_size)
-        # filling the surface with chosen enemy colour
-        self.image.fill(greenish)
-        # getting rectangle for positioning
+        self.image = pygame.image.load('img/animated_drone_with_no_background-removebg-preview.png')
+        self.image = pygame.transform.scale(self.image, (60,60))
         self.rect = self.image.get_rect()
 
         # starting the enemy at a random valid location on the screen

@@ -80,7 +80,7 @@ def game_loop():
         if current_state == "main":
             current_state = execute_game(player, selected_character)
         elif current_state == "shed":
-            current_state = shed(player, selected_character)
+            current_state = shed(player, selected_character, bg_width, bg_height)
 
 
 

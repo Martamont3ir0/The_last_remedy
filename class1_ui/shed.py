@@ -4,12 +4,11 @@ from utils import *
 from utils import under_construction
 from player import Player
 
-def shed(player, selected_character):
+def shed(player, selected_character, bg_width, bg_height):
     # Basic setup
     # setting up the background:
-    background = pygame.image.load("img/farm.png")
-    background = pygame.transform.scale(background, (width, height))
-    bg_width, bg_height = background.get_size()  # Get the dimensions of the background image
+    background = pygame.image.load("img/thewastesbg.jpeg")
+
     screen = pygame.display.set_mode(resolution)
     clock = pygame.time.Clock()
 
@@ -34,10 +33,7 @@ def shed(player, selected_character):
             if event.type == pygame.QUIT:
                 pygame.quit()
 
-
         player_group.draw(screen)  # Draw the player on the screen
-
-
 
         # Update the player's position
         player.update()
@@ -46,13 +42,6 @@ def shed(player, selected_character):
             under_construction()  # Trigger the under_construction screen
             player.rect.top = 200  # Reset player position to prevent instant re-trigger
             player.rect.left = 560
-
-        # Allow returning to the main screen
-        if player.rect.left <= 0:
-            player.rect.left = width - player.rect.width
-            return "main"  # Transition back to the main game
-
-
 
         pygame.display.flip()
 
