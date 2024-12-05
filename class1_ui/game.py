@@ -11,8 +11,8 @@ def character_selection_screen():
     pygame.display.set_caption("Character Selection")
 
     # Load character images
-    girl_image = pygame.image.load("class1_ui/img/lucaquinn_female.jpg")  # Correct image path for girl character
-    boy_image = pygame.image.load("class1_ui/img/lucaquinn_male.jpg")  # Correct image path for boy character
+    girl_image = pygame.image.load("img/lucaquinn_female.jpg")  # Correct image path for girl character
+    boy_image = pygame.image.load("img/lucaquinn_male.jpg")  # Correct image path for boy character
 
     # Scale images
     girl_image = pygame.transform.scale(girl_image, (150, 150))
@@ -47,16 +47,15 @@ def character_selection_screen():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if girl_rect.collidepoint(event.pos):
                     selected_character = "girl"  # Set to "girl"
-                    character_image_path = "lucaquinn_female.jpg"  # Store the image path
+                    character_image_path = "img/female-removebg-preview.png"  # Store the image path
                 elif boy_rect.collidepoint(event.pos):
                     selected_character = "boy"  # Set to "boy"
-                    character_image_path = "lucaquinn_male.jpg"  # Store the image path
+                    character_image_path = "img/male-removebg-preview__1_-removebg-preview.png"  # Store the image path
 
         pygame.display.flip()
         clock.tick(30)
 
     return character_image_path  # Return the image path, not just the character name
-
 
 
 
@@ -69,7 +68,7 @@ def game_loop():
 
     # SETUP:
     # Load the background image and get its size (bg_width, bg_height)
-    background = pygame.image.load("class1_ui/img/backroundscenario.jpg")  # Make sure this path is correct
+    background = pygame.image.load("img/backroundscenario.jpg")  # Make sure this path is correct
     bg_width, bg_height = background.get_size()  # Get the dimensions of the background image
 
     # Create the player with the selected image path, and pass bg_width and bg_height
@@ -81,10 +80,7 @@ def game_loop():
         if current_state == "main":
             current_state = execute_game(player, selected_character)
         elif current_state == "shed":
-            current_state = shed(player)
-
-
-
+            current_state = shed(player, selected_character)
 
 
 
@@ -94,7 +90,7 @@ def execute_game(player: Player = None, character_image_path=None):
     # SETUP:
 
     # setting up the background:
-    background = pygame.image.load("class1_ui/img/backroundscenario.jpg")
+    background = pygame.image.load("img/backroundscenario.jpg")
     bg_width, bg_height = background.get_size()  # **New Line: Get the original size of the background image**
 
     # Create the player with the selected character image

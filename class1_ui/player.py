@@ -3,10 +3,12 @@ from config import *
 import pygame
 import math
 from bullet import Bullet
+from PIL import Image
+import random
 
-
-
-
+#Constants for my shaking implementation
+shake_duration = 10  # Number of frames to shake
+shake_intensity = 5  # Maximum pixels to shake
 
 # making Player a child of the Sprite class
 class Player(pygame.sprite.Sprite):
@@ -14,10 +16,11 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
 
         # VISUAL VARIABLES
-        self.image = pygame.Surface(player_size)
-        self.image.fill(cute_purple)
+        self.image = pygame.image.load(character_image_path)
+        self.image = pygame.transform.scale(self.image, (55, 100))
         self.rect = self.image.get_rect()
         self.rect.center = (width // 2, height // 2)
+        self.shake_counter = 0  # Counter for shake duration
 
         # GAMEPLAY VARIABLES
         self.speed = 5
@@ -28,18 +31,42 @@ class Player(pygame.sprite.Sprite):
         self.bg_width = bg_width
         self.bg_height = bg_height
 
+
+
     def update(self):
+        """
+
+        :return:
+        """
         keys = pygame.key.get_pressed()
 
         # CHANGED: Use bg_width and bg_height to restrict movement
         if keys[pygame.K_w] and self.rect.top > 0:
             self.rect.y -= self.speed
+            self.shake() #Calling the shake function each time it moves
         if keys[pygame.K_s] and self.rect.bottom < self.bg_height:  # Use bg_height for bottom limit
             self.rect.y += self.speed
+            self.shake()
         if keys[pygame.K_a] and self.rect.left > 0:
             self.rect.x -= self.speed
+            self.shake()
         if keys[pygame.K_d] and self.rect.right < self.bg_width:  # Use bg_width for right limit
             self.rect.x += self.speed
+            self.shake()
+
+        # Handle shaking effect
+        if self.shake_counter > 0:
+            self.rect.x += random.randint(-shake_intensity, shake_intensity)
+            self.rect.y += random.randint(-shake_intensity, shake_intensity)
+            self.shake_counter -= 1  # Decrease the shake counter
+
+    def shake(self):
+        """
+        Shaking implementation so that the player looks more realistic when moving
+        :return: initiation of shake counter
+        """
+        if self.shake_counter == 0:  # Start shaking if not already shaking
+            self.shake_counter = shake_duration
 
     def shoot(self, bullets):
         """
