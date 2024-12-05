@@ -18,17 +18,18 @@ def interface():
 
 
     # setting the fonts
-    corbelfont = pygame.font.SysFont("Corbel", 50)
-    comicsansfont = pygame.font.SysFont("Comic Sans MS", 50)
+    bookantiqua = pygame.font.SysFont("bookantiqua", 50)
+    title_font = pygame.font.SysFont("bookantiqua", 72)
 
     # render the text (will be used in the game button)
-    wilderness_text = corbelfont.render("Start Game ", True, white)
-    quit_text = corbelfont.render("quit", True, white)
-    rules_text = corbelfont.render("rules", True, white)
-    options_text = corbelfont.render("options", True, white)
-    credits_text = corbelfont.render("credits", True, white)
-    title_text = comicsansfont.render("Computation III - Project", True, glowing_light_red)
+    wilderness_text = bookantiqua.render("Start Game ", True, white)
+    quit_text = bookantiqua.render("quit", True, white)
+    rules_text = bookantiqua.render("rules", True, white)
+    options_text = bookantiqua.render("options", True, white)
+    credits_text = bookantiqua.render("credits", True, white)
 
+    title_text = title_font.render("The last remedy ", True, greenish)
+    title_shadow= title_font.render("The last remedy", True, deep_black)
 
 
     # main interface loop (will run until the user quits)
@@ -75,6 +76,20 @@ def interface():
         # displaying the background image
         screen.blit(main_background, (0, 0))
 
+        # avoid shadow overlap
+        shadow_offset_x = 4
+        shadow_offset_y = 4
+
+        #showing title of project with shadow
+        title_rect= title_text.get_rect(center=(width//2,100))
+        shadow_rect= title_shadow.get_rect(center=(width//2+5,105))
+
+
+
+        #shadow and title
+        screen.blit(title_shadow, shadow_rect.topleft)
+        screen.blit(title_text, title_rect.topleft)
+
 
         # wilderness explorer button
         pygame.draw.rect(screen, dark_red, [90, 240, 540, 60])
@@ -101,8 +116,6 @@ def interface():
         credits_rect = credits_text.get_rect(center=(450 + 140 // 2, 480 + 60 // 2))  # text centered in the button
         screen.blit(credits_text, credits_rect)
 
-        # showing the title of the project
-        screen.blit(title_text, (55, 0))
 
         # update the display so that the loop changes will appear
         pygame.display.update()
@@ -130,13 +143,13 @@ def credits_():
     overlay.fill((0, 0, 0, 128))  # Black with 50% opacity (alpha = 128)
 
     # creating the fonts:
-    corbelfont = pygame.font.SysFont("Corbel", 50)
-    comicsansfont = pygame.font.SysFont("Comic Sans MS", 25)
+    bookantiqua = pygame.font.SysFont("bookantiqua", 50)
+    baskervilleoldface = pygame.font.SysFont("baskervilleoldface", 25)
 
     # creating the rendered texts for the credits
-    augusto_text = comicsansfont.render("Augusto Santos, ajrsantos@novaims.unl.pt", True, white)
-    diogo_text = comicsansfont.render("Diogo Rastreio, drasteiro@novaims.unl.pt", True, white)
-    liah_text = comicsansfont.render("Liah Rosenfeld, lrosenfeld@novaims.unl.pt", True, white)
+    augusto_text = bookantiqua.render("Augusto Santos, ajrsantos@novaims.unl.pt", True, white)
+    diogo_text = bookantiqua.render("Diogo Rastreio, drasteiro@novaims.unl.pt", True, white)
+    liah_text = bookantiqua.render("Liah Rosenfeld, lrosenfeld@novaims.unl.pt", True, white)
 
     # main loop to detect user input and displaying the credits page
 
@@ -170,7 +183,7 @@ def credits_():
 
         # drawing and displaying the back button
         pygame.draw.rect(screen, dark_red, [450, 600, 140, 60])
-        back_text = corbelfont.render("back", True, white)
+        back_text = bookantiqua.render("back", True, white)
         back_rect = back_text.get_rect(center=(450 + 140 // 2, 600 + 60 // 2))
         screen.blit(back_text, back_rect)
 
@@ -191,8 +204,8 @@ def rules():
     overlay = pygame.Surface(resolution, pygame.SRCALPHA)  # Create a surface with alpha channel
     overlay.fill((0, 0, 0, 128))  # Black with 50% opacity (alpha = 128)
     # creating the fonts:
-    corbelfont = pygame.font.SysFont("Corbel", 20)
-    comicsansfont = pygame.font.SysFont("Comic Sans MS", 12)
+    bookantique = pygame.font.SysFont("bookantique", 20)
+    baskervilleoldface = pygame.font.SysFont("baskervilleoldface", 14)
 
     # main loop to detect user input and displaying the rules page
 
@@ -253,7 +266,7 @@ def rules():
         i = 10  # Starting y position for text
         for line in story_text:
             # Render the line of text
-            rendered_line = comicsansfont.render(line, True, white)
+            rendered_line = baskervilleoldface.render(line, True, white)
             # Blit the rendered text onto the screen at the specified position
             screen.blit(rendered_line, (10, i))
             # Increment the y position for the next line
@@ -261,7 +274,7 @@ def rules():
 
         # drawing and displaying the back button
         pygame.draw.rect(screen, dark_red, [450, 600, 140, 60])
-        back_text = corbelfont.render("Back", True, white)
+        back_text = bookantique.render("Back", True, white)
         back_rect = back_text.get_rect(center=(450 + 140 // 2, 600 + 60 // 2))
         screen.blit(back_text, back_rect)
 
