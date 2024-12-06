@@ -431,6 +431,8 @@ def rules():
         pygame.display.update()
         clock.tick(30)
 
+def wilderness_explorer():
+    game_loop()
 
 
 
