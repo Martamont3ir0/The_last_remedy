@@ -22,7 +22,8 @@ def draw_slide(screen, slide, font, color, x,y, max_width, line_spacing):
     - line_spacing: space between lines
 
     """
-    current_y=y
+    #current_y=y
+    wrapped_lines=[]
     for line in slide:
         words = line.split(" ")
         wrapped_line = ""
@@ -35,16 +36,28 @@ def draw_slide(screen, slide, font, color, x,y, max_width, line_spacing):
                 wrapped_line = test_line
             else:
                 # Render the current line and move to the next line
-                rendered_line = font.render(wrapped_line, True, color)
-                screen.blit(rendered_line, (x, current_y))
-                current_y += line_spacing
+                #rendered_line = font.render(wrapped_line, True, color)
+                #screen.blit(rendered_line, (x, current_y))
+                #current_y += line_spacing
+                wrapped_lines.append(wrapped_line)
                 wrapped_line = word  # Start the next line with the current word
 
         # Render any remaining text in the line
         if wrapped_line:
-            rendered_line = font.render(wrapped_line, True, color)
-            screen.blit(rendered_line, (x, current_y))
-            current_y += line_spacing
+            wrapped_lines.append(wrapped_line)
+            #rendered_line = font.render(wrapped_line, True, color)
+            #screen.blit(rendered_line, (x, current_y))
+            #current_y += line_spacing
+    #calculate the total height of the text block
+    total_height= len(wrapped_lines)* line_spacing
+    start_y= (height-total_height)//2 #center vertically
+
+    #each wrapped line needs to be centered horizontally
+    for i, line in enumerate(wrapped_lines):
+        rendered_line= font.render(line,True, color)
+        line_width= rendered_line.get_width()
+        line_x= (width-line_width)//2 #center horizontally
+        screen.blit(rendered_line, (line_x, start_y+i*line_spacing))
 
 
 
@@ -119,6 +132,11 @@ def interface():
 
     # initiating pygame
     pygame.init() # calling pygame
+
+    # add background music
+    pygame.mixer.music.load("audio/Star Wars IV A new hope - Binary Sunset (Force Theme).mp3")
+    pygame.mixer.music.play(-1)  # -1 means the music will loop indefinitely
+
     # creating the screen at the set resolution
     screen = pygame.display.set_mode(resolution) # show the user something
 
@@ -214,9 +232,6 @@ def credits_():
     # basic settings
     screen = pygame.display.set_mode(resolution)
 
-    # add background music
-    pygame.mixer.music.load("audio/Star Wars IV A new hope - Binary Sunset (Force Theme).mp3")
-    pygame.mixer.music.play(-1)  # -1 means the music will loop indefinitely
 
     # load the background image
     credits_bg = pygame.image.load('img/creditsbg.png')
@@ -269,10 +284,7 @@ def credits_():
         # drawing and displaying the back button
         back_button_rect= pygame.Rect(450,600,140,60)
         draw_buttons(screen, "Back", back_button_rect, bookantiqua, dark_red, white, glowing_light_red, mouse)
-        #pygame.draw.rect(screen, dark_red, [450, 600, 140, 60])
-        #back_text = bookantiqua.render("back", True, white)
-        #back_rect = back_text.get_rect(center=(450 + 140 // 2, 600 + 60 // 2))
-        #screen.blit(back_text, back_rect)
+
 
         # updating the display
         pygame.display.update()
@@ -292,7 +304,6 @@ def rules():
     # creating the fonts:
     header_font= pygame.font.SysFont("timesnewroman", 50, bold=True)
     text_font= pygame.font.SysFont("timesnewroman", 25) #main content
-    key_phrase_font= pygame.font.SysFont("timesnewroman", 25, italic=True) #emphasized text
 
     #colors:
     white= (255,255,255)
@@ -302,8 +313,10 @@ def rules():
 
     # story paragraphs
     story_slides = [
-        ["Background Story"],
-        ["The World is Dying.","It’s 2032. A global catastrophe: The Burn has torn the world ."],
+        ["Background Story..."],
+        ["The World is Dying.",
+         "It’s 2032. ",
+         "A global catastrophe: The Burn has torn the world ."],
         ["Years of environmental abuse and unchecked technological greed have caused Earth’s atmosphere to collapse,",
         "unleashing deadly solar radiation that scorches the land and turns entire cities to ash."],
         ["The Elixir, a mysterious potion capable of reversing the damage of The Burn,"
@@ -314,7 +327,7 @@ def rules():
         "The International Coalition, the global superpower, controls the remaining vial and plans to use it to consolidate their power.",
         "They are prepared to do whatever it takes to keep the Elixir under their thumb."],
         ["You Are the Last Hope."],
-        ["You play as Luca Quinn, a former scientist who once worked on the Elixir project.",
+        ["You play as  a former scientist who once worked on the Elixir project.",
         "The Coalition shut it down, erased the research, and destroyed your life. "],
         ["Now, after years of hiding, you’ve learned of the missing ingredient—Solanum—and its location deep within the Wastes,",
         "a desolate region devastated by radiation. If you can retrieve it, you can complete the Elixir and change the world."],
@@ -322,7 +335,8 @@ def rules():
         "The Coalition’s Sentinels will stop at nothing to prevent you from reaching the plant.",
         "And there are others—mercenaries, factions, and desperate survivors—who want the Elixir for themselves.",
         ""],
-        ["In a dying world, everyone is a potential enemy."]
+        ["In a dying world, everyone is a potential enemy."],
+        ["Are you ready to save the world ? "]
     ]
 
     slide_index= 0
@@ -356,26 +370,22 @@ def rules():
 
         #draw current slide
         slide= story_slides[slide_index]
-        draw_slide(
-            screen=screen,
-            slide=slide,
-            font=text_font,
-            color=white,
-            x=50,
-            y=100,
-            max_width= width-100,
-            line_spacing=30
+        if slide_index==0: #special formatting for the first slide
+            title_surface= header_font.render("Background Story...", True, white)
+            title_rect= title_surface.get_rect(center=(width//2, height//3)) #center at the top
+            screen.blit(title_surface, title_rect)
+        else:
+
+            draw_slide(
+                screen=screen,
+                slide=slide,
+                font=text_font,
+                color=white,
+                x=50,
+                y=100,
+                max_width= width-100,
+                line_spacing=30
         )
-        #y_offset=100
-        #for line in slide:
-            #if line== "Background Story": #header
-                #rendered_line= header_font.render(line, True, white)
-            #elif "The Burn" in line or "The Elixir" in line: #highlighting ket phrases
-                #rendered_line= key_phrase_font.render(line, True, white)
-            #else: #main content
-                #rendered_line= text_font.render(line, True, white )
-            #screen.blit(rendered_line, (50, y_offset))
-            #y_offset+=40 #space between lines
 
 
         # button positions (centered at the bottom)
@@ -433,6 +443,5 @@ def rules():
 
 def wilderness_explorer():
     game_loop()
-
 
 
