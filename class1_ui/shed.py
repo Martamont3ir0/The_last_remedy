@@ -3,13 +3,13 @@ from config import *
 from utils import *
 from utils import under_construction
 from player import Player
+from start_message import *
 
-def shed(player, selected_character):
+def shed(player, selected_character, bg_width, bg_height):
     # Basic setup
     # setting up the background:
-    background = pygame.image.load("img/farm.png")
-    background = pygame.transform.scale(background, (width, height))
-    bg_width, bg_height = background.get_size()  # Get the dimensions of the background image
+    background = pygame.image.load("img/thewastesbg.jpeg")
+
     screen = pygame.display.set_mode(resolution)
     clock = pygame.time.Clock()
 
@@ -24,35 +24,37 @@ def shed(player, selected_character):
     player_group = pygame.sprite.Group()
     player_group.add(player)
 
+    #information for start message
+    level2_title = "Level 2: 'The Wastes'"
+    level2_description = ['Description for level 2','under construction....']
+
     running = True
+    show_message = True
+
     while running:
-        clock.tick(fps)
-        screen.blit(background, (0, 0))
+        #start by showing the level information
+        if show_message:
+            show_start_message(screen, level2_title, level2_description, background)
+            #after the function is implemented, boolean of show_message changes so that the game can continue
+            show_message = False
+        else:
+            clock.tick(fps)
+            screen.blit(background, (0, 0))
 
-        # Event handling
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
+            # Event handling
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
 
+            player_group.draw(screen)  # Draw the player on the screen
 
-        player_group.draw(screen)  # Draw the player on the screen
+            # Update the player's position
+            player.update()
 
+            if special_area.colliderect(player.rect):
+                under_construction()  # Trigger the under_construction screen
+                player.rect.top = 200  # Reset player position to prevent instant re-trigger
+                player.rect.left = 560
 
-
-        # Update the player's position
-        player.update()
-
-        if special_area.colliderect(player.rect):
-            under_construction()  # Trigger the under_construction screen
-            player.rect.top = 200  # Reset player position to prevent instant re-trigger
-            player.rect.left = 560
-
-        # Allow returning to the main screen
-        if player.rect.left <= 0:
-            player.rect.left = width - player.rect.width
-            return "main"  # Transition back to the main game
-
-
-
-        pygame.display.flip()
+            pygame.display.flip()
 
