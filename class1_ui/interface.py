@@ -242,16 +242,35 @@ def credits_():
     overlay.fill((0, 0, 0, 128))  # Black with 50% opacity (alpha = 128)
 
     # creating the fonts:
-    bookantiqua = pygame.font.SysFont("bookantiqua", 50)
-    baskervilleoldface = pygame.font.SysFont("baskervilleoldface", 25)
+    credits_font = pygame.font.SysFont("bookantiqua", 30)
+    header_font= pygame.font.SysFont("bookantiqua", 50, bold=True)
 
-    # creating the rendered texts for the credits
-    augusto_text = bookantiqua.render("Augusto Santos, ajrsantos@novaims.unl.pt", True, white)
-    diogo_text = bookantiqua.render("Diogo Rastreio, drasteiro@novaims.unl.pt", True, white)
-    liah_text = bookantiqua.render("Liah Rosenfeld, lrosenfeld@novaims.unl.pt", True, white)
+    # credits text
+    header_text = "'The Last Remedy' credits..."
+    credits=[
+        "Augusto Santos, ajrsantos@novaims.unl.pt",
+        "Diogo Rastreio, drasteiro@novaims.unl.pt",
+        "Liah Rosenfeld, lrosenfeld@novaims.unl.pt",
+        "Marta Monteiro, 20231666@novaims.unl.pt",
+        "Marta Trindade, 20231626@novaims.unl.pt",
+        "Martim  Pereira, 20231663@novaims.unl.pt"
+    ]
+
+    #animation settings
+    fade_alpha=0 #fade in effect of header
+    scroll_y= height #starting point for scrolling credits
+    scroll_speed= 1.5
+    header_fade_out= False
+
+
+
+    #button settings
+    button_y= height-60 #align with the bottom of the screen
+    back_x= width-150
+    clicked_button= None
+
 
     # main loop to detect user input and displaying the credits page
-
     while True:
         # getting the position of the user's mouse
         mouse = pygame.mouse.get_pos()
@@ -262,10 +281,16 @@ def credits_():
             if ev.type == pygame.QUIT:
                 pygame.quit()
 
-            # checking if the user clicked the back button
-            if ev.type == pygame.MOUSEBUTTONDOWN and back_button_rect.collidepoint(mouse):
-                interface()
-                return
+            #detect button clicks
+            elif ev.type==pygame.MOUSEBUTTONDOWN:
+                if back_hover.collidepoint(mouse):
+                    clicked_button= "Back To Menu"
+            elif ev.type==pygame.MOUSEBUTTONUP:
+                if clicked_button== "Back To Menu" and back_hover.collidepoint(mouse):
+                    interface()
+                    return
+                    clicked_button= None #reset button state
+
 
 
         # displaying my screen
@@ -275,16 +300,51 @@ def credits_():
         screen.blit(credits_bg, (0, 0))
         screen.blit(overlay, (0, 0))
 
+        #handle header fade in fade out
+        if not header_fade_out:
+            if fade_alpha<255:
+                fade_alpha += 2  # fade in effect
+            else:
+                header_fade_out=True
+        elif fade_alpha>0:
+            fade_alpha-=2 #fade out effect
 
-        # displaying our texts
-        screen.blit(augusto_text, (0, 0))
-        screen.blit(diogo_text, (0, 25))
-        screen.blit(liah_text, (0, 50))
 
-        # drawing and displaying the back button
-        back_button_rect= pygame.Rect(450,600,140,60)
-        draw_buttons(screen, "Back", back_button_rect, bookantiqua, dark_red, white, glowing_light_red, mouse)
+        header_surface= header_font.render(header_text, True, white)
+        header_surface.set_alpha(fade_alpha)
+        header_rect= header_surface.get_rect(center=(width//2, height//3))
+        screen.blit(header_surface, header_rect)
 
+        #start scrolling credits when the header is fully faded in
+        if fade_alpha==255:
+            header_fade_complete=True
+
+
+        #scroll credits from bottom to top after fade in
+        if header_fade_out or fade_alpha<255:
+            for i, line in enumerate(credits):
+                line_surface= credits_font.render(line,True, white)
+                line_rect= line_surface.get_rect(center=(width//2,scroll_y+i*50))
+                screen.blit(line_surface, line_rect)
+
+            scroll_y-=scroll_speed #move the text upward
+            if scroll_y + len(credits)*50<0:
+              scroll_y= height
+
+        #draw Back To Menu button
+        is_hover = back_x - 70 <= mouse[0] <= back_x + 70 and button_y <= mouse[1] <= button_y + 40
+        is_clicked= clicked_button== "Back To Menu"
+
+        if is_clicked:
+            button_color= (200,50,50) #grey color
+        elif is_hover:
+            button_color=  (128,128,128)
+        else:
+            button_color= white
+
+        button_text= credits_font.render("Back To Menu", True, button_color)
+        back_hover= button_text.get_rect(center=(back_x, button_y))
+        screen.blit(button_text, back_hover)
 
         # updating the display
         pygame.display.update()
