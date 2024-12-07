@@ -4,6 +4,7 @@ import math
 import pygame
 from player import Player
 from shed import shed
+from start_message import *
 
 def character_selection_screen():
     # Screen setup
@@ -57,8 +58,6 @@ def character_selection_screen():
 
     return character_image_path  # Return the image path, not just the character name
 
-
-
 def game_loop():
     # Character selection
     selected_character = character_selection_screen()  # Returns image path
@@ -66,10 +65,23 @@ def game_loop():
     # Debugging: Check if image path was correctly selected
     print(f"Character image path: {selected_character}")  # Debugging output
 
+    # Show start message after character selection
+    level1_title = "Level 1: 'The Map'"
+    level1_description = [
+        "Objective: Find the map that reveals the location of Solanum in the Wastes.",
+        "Key Challenge: Avoid being caught by the Sentinel Drones until the clock resets.",
+        "Once it does, they’ll leave you alone, allowing you to search for the map.",
+        "Note: GRAVITY DOESN’T EXIST IN THIS PLACE, so you’ll be floating as you navigate."
+    ]
     # SETUP:
     # Load the background image and get its size (bg_width, bg_height)
     background = pygame.image.load("img/backroundscenario.jpg")  # Make sure this path is correct
     bg_width, bg_height = background.get_size()  # Get the dimensions of the background image
+
+    screen = pygame.display.set_mode(resolution)
+    show_start_message(screen,level1_title,level1_description,background)
+
+
 
     # Create the player with the selected image path, and pass bg_width and bg_height
     player = Player(bg_width, bg_height, selected_character)  # Pass image path directly
@@ -102,7 +114,7 @@ def execute_game(player: Player = None, character_image_path=None):
 
     # screen setup:
     screen = pygame.display.set_mode(resolution)
-    pygame.display.set_caption("Endless Wilderness Explorer")
+    pygame.display.set_caption("The Last Remedy")
 
     # CHANGED: Initialize the player if not already passed
     if player is None:
