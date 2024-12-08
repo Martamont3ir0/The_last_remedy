@@ -34,11 +34,4 @@ def show_start_message(screen, level_title,level_description, background):
         screen.blit(rendered_line, (15, i))
         # Increment the y position for the next line
         i += 70  # Increase y position for next line (30 pixels apart)
-    pygame.display.flip()
 
-    # handling events:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-
-    pygame.time.delay(10000)  # Delay for 10000 milliseconds (10 seconds)
