@@ -220,6 +220,7 @@ def execute_game(player: Player = None, character_image_path=None):
         # Draw the player and enemies
         player_group.draw(screen)
         enemies.draw(screen)
+        bullets.draw(screen)
 
         # Handle bullet collisions
         for bullet in bullets:

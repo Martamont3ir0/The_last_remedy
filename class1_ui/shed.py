@@ -35,6 +35,7 @@ def shed(player, selected_character, bg_width, bg_height):
         #start by showing the level information
         if show_message:
             show_start_message(screen, level2_title, level2_description, background)
+            pygame.display.flip()
             #after the function is implemented, boolean of show_message changes so that the game can continue
             show_message = False
         else:

@@ -15,8 +15,10 @@ class Bullet(pygame.sprite.Sprite):
         self.color = deep_black
         self.speed = 7
 
-        # updating the x and y positions to fit the circle
-        self.rect = pygame.Rect(x - self.radius, y - self.radius, self.radius * 2, self.radius * 2)
+        # Create a surface for the bullet
+        self.image = pygame.Surface((self.radius * 2, self.radius * 2), pygame.SRCALPHA)  # Create a transparent surface
+        pygame.draw.circle(self.image, self.color, (self.radius, self.radius),self.radius)  # Draw the bullet on the surface
+        self.rect = self.image.get_rect(center=(x, y))  # Set the initial position of the bullet
 
     def update(self):
 
@@ -29,6 +31,3 @@ class Bullet(pygame.sprite.Sprite):
         if self.rect.x < 0 or self.rect.x > width or self.rect.y < 0 or self.rect.y > height:
             self.kill()
 
-    def draw(self, screen):
-        # drawing the bullet on the screen
-        pygame.draw.circle(screen, self.color, self.rect.center, self.radius)
