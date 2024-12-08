@@ -4,8 +4,10 @@ from utils import *  # no need to import pygame because the import is in utils
 from config import *  # importing colors and the like
 from utils import under_construction
 from PIL import Image
-import textwrap
-#split long lines of text into shorter ones based on screen width
+import textwrap #split long lines of text into shorter ones based on screen width
+import time #for timing effect
+
+
 
 #function for text wrapping
 def draw_slide(screen, slide, font, color, x,y, max_width, line_spacing):
@@ -124,8 +126,110 @@ def draw_buttons (screen, text, rect, font,base_color, text_color, hover_color, 
     #return True if clicked
     return rect.collidepoint(mouse_pos)
 
+def confirm_quit(screen):
+    """
+    Handles the quit confirmation dialog
+    """
 
+    #capture the current screen
+    background= screen.copy()
 
+    #dimensions for the confirmation box
+    confirm_width, confirm_height= 450,250
+    confirm_x= (width- confirm_width)//2
+    confirm_y= (height-confirm_height)//2
+
+    #create the box and text font
+    confirm_box= pygame.Rect(confirm_x, confirm_y, confirm_width, confirm_height)
+    dialog_font= pygame.font.SysFont("bookantiqua", 32)
+    button_font= pygame.font.SysFont("bookantiqua", 30)
+
+    #button dimensions and positions
+    button_width, button_height= 120,50
+    yes_button= pygame.Rect(
+        confirm_x+50, confirm_y+confirm_height-80, button_width, button_height
+    )
+    no_button= pygame.Rect(
+        confirm_x+confirm_width-50-button_width,
+        confirm_y+confirm_height-80,
+        button_width,
+        button_height
+    )
+    clicked_button=None
+
+    while True:
+        mouse= pygame.mouse.get_pos()
+        for ev in pygame.event.get():
+            if ev.type==pygame.QUIT:
+                pygame.quit()
+                return False
+            if ev.type==pygame.MOUSEBUTTONDOWN:
+                if yes_button.collidepoint(mouse):
+                    clicked_button= "Yes"
+                elif no_button.collidepoint(mouse):
+                    clicked_button="No"
+            elif ev.type==pygame.MOUSEBUTTONUP:
+                if clicked_button=="Yes" and yes_button.collidepoint(mouse):
+                    return False
+                elif clicked_button=="No" and no_button.collidepoint(mouse):
+                    return True
+                clicked_button=None
+
+        #drawing dimmed background
+        screen.blit(background, (0,0))
+        dim_overlay= pygame.Surface(resolution, pygame.SRCALPHA)
+        dim_overlay.fill((0,0,0,180)) #semi-transparent black
+        screen.blit(dim_overlay, (0,0))
+
+        #drawing confirmation dialog box
+        pygame.draw.rect(screen, (50,50,50), confirm_box, border_radius=15)
+        pygame.draw.rect(screen, white, confirm_box, 4, border_radius=15)
+
+        #drawing dialog text
+        dialog_text= dialog_font.render(
+            "Are you sure you want to quit?", True, white
+        )
+        dialog_rect= dialog_text.get_rect(center=(width//2, confirm_y+90))
+        screen.blit(dialog_text, dialog_rect)
+
+        #drawing the yes or no buttons for quitting
+        is_hover_yes= yes_button.collidepoint(mouse)
+        is_clicked_yes=clicked_button=="Yes"
+        draw_buttons(
+            screen=screen,
+            text= "Yes",
+            rect=yes_button,
+            font=button_font,
+            base_color=(169,169,169),
+            text_color= white,
+            hover_color=(173,216,230) if is_hover_yes else (169,169,169),
+            mouse_pos= mouse
+        )
+        if is_clicked_yes:
+            pygame.draw.rect(screen, (0,0,139), yes_button, border_radius=10)
+            yes_text= button_font.render("Yes", True, white)
+            yes_rect= yes_text.get_rect(center=yes_button.center)
+            screen.blit(yes_text, yes_rect)
+
+        is_hover_no= no_button.collidepoint(mouse)
+        is_clicked_no= clicked_button=="No"
+        draw_buttons(
+            screen=screen,
+            text="No",
+            rect=no_button,
+            font=button_font,
+            base_color=(169,169,169) ,
+            text_color=white,
+            hover_color=(173,216,230)if is_hover_no else (169,169,169),
+            mouse_pos= mouse
+        )
+        if is_clicked_no:
+            pygame.draw.rect(screen, (0,0,139), no_button, border_radius=10)
+            no_text= button_font.render("No", True, white)
+            no_rect= no_text.get_rect(center=no_button.center)
+            screen.blit(no_text,no_rect)
+
+        pygame.display.update()
 
 
 def interface():
@@ -152,43 +256,96 @@ def interface():
     # setting the fonts
     bookantiqua = pygame.font.SysFont("bookantiqua", 40)
     title_font = pygame.font.SysFont("garamond", 80, bold=True, italic=True)
+    start_game_font = pygame.font.SysFont("perpetua", 50)  # script can ne another option
+
+    clicked_button= None #tracking clicks
+
+    #pulsing variables for start game button effect
+    fade_alpha= 255 #start fully visible
+    fade_delta= -5 #rate of fading
+
+    # drawing the other buttons
+    def other_buttons(text, x, y, hover_key, width=180, height=60):
+        """
+        creates a button with a filled rectangle and hover effects
+
+        parameters:
+        -text:text on the button
+        -x,y: coordinates of the button's center
+        -hover_key: key to track hover and clicked state
+        -width, height:button's dimension
+
+        returns:
+        - pygame.Rect: the rectangle area for the button for hover and click detection
+        """
+
+        is_hover = x - width // 2 <= mouse[0] <= x + width // 2 and y - height // 2 <= mouse[1] <= y + height // 2
+        is_clicked = clicked_button == hover_key
+
+        # setting color based on the state of the button
+        if is_clicked:
+            text_color = white
+            fill_color = (0, 200, 0)
+        elif is_hover:
+            text_color = white
+            fill_color = (50, 255, 50)
+        else:
+            text_color = white
+            fill_color = (0, 150, 0)
 
 
+        rect = pygame.Rect(x - width // 2, y - height // 2, width, height)
+        pygame.draw.rect(screen, fill_color, rect, border_radius=10)
+        pygame.draw.rect(screen, (0, 255, 0), rect, width=3, border_radius=10)
 
-    # main interface loop (will run until the user quits)
+        # for text
+        button_text = bookantiqua.render(text, True, text_color)
+        text_rect = button_text.get_rect(center=(x, y))
+        screen.blit(button_text, text_rect)
+
+        return rect
+
     while True:
+        #getting the mouse position
+        mouse= pygame.mouse.get_pos()
 
-        # getting the mouse position (future need)
-        mouse = pygame.mouse.get_pos()
-
-        # event detection (future work)
+        #event detection
         for ev in pygame.event.get():
-            # seeing if the user hits the red x button
-            if ev.type == pygame.QUIT:
+            #seeing if the user hits the red x button
+            if ev.type==pygame.QUIT:
                 pygame.quit()
 
             #check button clicks
             if ev.type==pygame.MOUSEBUTTONDOWN:
-                #quit button
-                if quit_button_rect.collidepoint(mouse):
-                    pygame.quit()
-                    return #exit the function cleanly
-                #credits buttons
-                if credits_button_rect.collidepoint(mouse):
-                    credits_()
-                    return #return to this function when back is clicked
-                #start game button
-                if start_button_rect.collidepoint(mouse):
+                #check if start game button is clicked
+                if start_hover.collidepoint(mouse):
+                    clicked_button= "Start Game"
+                elif credits_hover.collidepoint(mouse):
+                    clicked_button= "Credits"
+                elif quit_hover.collidepoint(mouse):
+                    clicked_button= "Quit"
+                elif rules_hover.collidepoint(mouse):
+                    clicked_button= "Rules"
+                elif options_hover.collidepoint(mouse):
+                    clicked_button= "Options"
+            elif ev.type==pygame.MOUSEBUTTONUP:
+                #handle button actions when mouse is released
+                if clicked_button=="Start Game" and start_hover.collidepoint(mouse):
                     wilderness_explorer()
-                    return #return after the game loop
-                #options button
-                if options_button_rect.collidepoint(mouse):
-                    under_construction()
-                    return #return to this function when back is clicked
-                if rules_button_rect.collidepoint(mouse):
+                    return
+                elif clicked_button=="Credits" and credits_hover.collidepoint(mouse):
+                    credits_()
+                elif clicked_button=="Quit" and quit_hover.collidepoint(mouse):
+                    if not confirm_quit(screen):
+                        return
+
+                elif clicked_button=="Rules" and rules_hover.collidepoint(mouse):
                     rules()
                     return
-
+                elif clicked_button=="Options" and options_hover.collidepoint(mouse):
+                    under_construction()
+                    return
+                clicked_button= None #reset the clicked button state
 
 
         # filling the screen
@@ -208,25 +365,41 @@ def interface():
             glow_color=(0,255,0),
             shadow_color=white
         )
-        #defining button rectangles
-        start_button_rect = pygame.Rect(90, 240, 540, 60)
-        draw_buttons(screen, "Start Game", start_button_rect, bookantiqua, dark_red, white, glowing_light_red, mouse)
 
-        rules_button_rect = pygame.Rect(90, 480, 140, 60)
-        draw_buttons(screen, " Rules", rules_button_rect, bookantiqua, grey, white, glowing_light_red, mouse)
+        #effect for start game button
+        fade_alpha+=fade_delta
+        if fade_alpha<=100 or fade_alpha>=255: #reverse fading direction
+            fade_delta*= -1
+        fade_alpha = max(100, min(255, fade_alpha)) #alpha value is between 100 and 255
 
-        options_button_rect = pygame.Rect(90, 600, 140, 60)
-        draw_buttons(screen, "Options", options_button_rect, bookantiqua, grey, white, glowing_light_red, mouse)
+        #drawing start game button
+        start_button_x= width//2 #center it horizontally
+        start_button_y= 340#vertical position for button
+        is_hover = (start_button_x - 100 <= mouse[0] <= start_button_x + 100 and
+                    start_button_y - 20 <= mouse[1] <= start_button_y + 20)
+        is_clicked= clicked_button== "Start Game"
+        if is_clicked:
+            button_color= (200,50,50)
+        elif is_hover:
+            button_color= (128,128,128)
+        else:
+            button_color= white
 
-        credits_button_rect = pygame.Rect(450, 480, 140, 60)
-        draw_buttons(screen, "Credits", credits_button_rect, bookantiqua, grey, white, glowing_light_red, mouse)
 
-        quit_button_rect = pygame.Rect(450, 600, 140, 60)
-        draw_buttons(screen, "Quit", quit_button_rect, bookantiqua, grey, white, glowing_light_red, mouse)
+        start_text= start_game_font.render("Start Game", True, button_color)
+        start_text.set_alpha(fade_alpha) #set alpha for pulsing effect
+        start_hover= start_text.get_rect(center=(start_button_x, start_button_y))
+        screen.blit(start_text, start_hover)
+
+
+        rules_hover = other_buttons("Rules", width//4,500,"Rules")
+        options_hover= other_buttons("Options", width//4,600, "Options")
+        credits_hover= other_buttons("Credits", (width//4)*3, 500, "Credits")
+        quit_hover= other_buttons("Quit", (width//4)*3, 600, "Quit")
 
         # update the display so that the loop changes will appear
         pygame.display.update()
-
+        pygame.time.delay(30) #speed of the pulse
 
 def credits_():
     # basic settings
