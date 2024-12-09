@@ -6,6 +6,7 @@ from shed import shed
 from start_message import *
 import time
 from puzzle_message import *
+from death import *
 
 def character_selection_screen():
     # Screen setup
@@ -101,8 +102,8 @@ def game_loop():
 
         show_start_message(screen,level1_title,level1_description,background)
         # Check if 8 seconds have passed
-        if pygame.time.get_ticks() - start_time >= 8000:
-            pygame.mixer.music.play(-1)  # Start playing music after 8 seconds
+        if pygame.time.get_ticks() - start_time >= 6000:
+            pygame.mixer.music.play(-1)  # Start playing music after 6 seconds
         if pygame.time.get_ticks() - start_time >= 10000: #After 10 seconds, the loop of start message ends
             running = False
 
@@ -230,6 +231,22 @@ def execute_game(player: Player = None, character_image_path=None):
                 bullet.kill()
                 if enemy.health <= 0:
                     enemy.kill()
+
+        # Handle enemy/player collisions
+        collided_enemies = pygame.sprite.spritecollide(player, enemies, False)
+
+        # Check if the player has collided with any enemies
+        if collided_enemies:
+            death()
+
+            #for enemy in collided_enemies:
+                ## Handle collision with each enemy
+                #player.health -= enemy.damage  # Assuming enemies have a damage attribute
+
+                # Check if the player's health is less than or equal to zero
+                #if player.health <= 0:
+              # Call the death function
+                    #break  # Exit the loop if the player is dead
 
         # Check if the player has reached the right edge of the screen
         if player.rect.right >= width:

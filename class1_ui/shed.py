@@ -30,32 +30,52 @@ def shed(player, selected_character, bg_width, bg_height):
 
     running = True
     show_message = True
+    # add desert music
+    pygame.mixer.music.load("audio/desertbgmusic.wav")
+    # Set the volume (0.0 to 1.0)
+    pygame.mixer.music.set_volume(0.3)  # Sets the volume to 30%
+
+    # Start a timer
+    start_time = pygame.time.get_ticks()
+
+    # Main loop
+    running = True
 
     while running:
-        #start by showing the level information
-        if show_message:
-            show_start_message(screen, level2_title, level2_description, background)
-            pygame.display.flip()
-            #after the function is implemented, boolean of show_message changes so that the game can continue
-            show_message = False
-        else:
-            clock.tick(fps)
-            screen.blit(background, (0, 0))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+        # Show level start message
 
-            # Event handling
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
+        show_start_message(screen, level2_title, level2_description, background)
 
-            player_group.draw(screen)  # Draw the player on the screen
+        if pygame.time.get_ticks() - start_time >= 6000:
+            pygame.mixer.music.play(-1)  # Start playing music after 6 seconds
+        if pygame.time.get_ticks() - start_time >= 10000:  # After 10 seconds, the loop of start message ends
+            running = False
 
-            # Update the player's position
-            player.update()
+        # Update the display (if needed)
+        pygame.display.flip()
 
-            if special_area.colliderect(player.rect):
-                under_construction()  # Trigger the under_construction screen
-                player.rect.top = 200  # Reset player position to prevent instant re-trigger
-                player.rect.left = 560
+    while True:
 
-            pygame.display.flip()
+        clock.tick(fps)
+        screen.blit(background, (0, 0))
+
+        # Event handling
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+
+        player_group.draw(screen)  # Draw the player on the screen
+
+        # Update the player's position
+        player.update()
+
+        if special_area.colliderect(player.rect):
+            under_construction()  # Trigger the under_construction screen
+            player.rect.top = 200  # Reset player position to prevent instant re-trigger
+            player.rect.left = 560
+
+        pygame.display.flip()
 

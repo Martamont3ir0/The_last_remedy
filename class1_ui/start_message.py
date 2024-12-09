@@ -31,7 +31,7 @@ def show_start_message(screen, level_title,level_description, background):
         # Render the line of text
         rendered_line = font.render(line, True, glowing_light_red)
         # Blit the rendered text onto the screen at the specified position
-        screen.blit(rendered_line, (15, i))
+        screen.blit(rendered_line, (width//2-rendered_line.get_width() //2, i))
         # Increment the y position for the next line
         i += 70  # Increase y position for next line (30 pixels apart)
 
