@@ -237,16 +237,17 @@ def execute_game(player: Player = None, character_image_path=None):
 
         # Check if the player has collided with any enemies
         if collided_enemies:
+            player.health -= 25#example of damage from enemy
+            for drone in collided_enemies:
+                drone.kill() #kill the enemy so it doesn't affect more the player
+                print(player.health) #checking if health is being correctly messed with
+
+        # Check if the player's health is less than or equal to zero, which means death time
+        if player.health <= 0:
             death()
+            player.health = 100
 
-            #for enemy in collided_enemies:
-                ## Handle collision with each enemy
-                #player.health -= enemy.damage  # Assuming enemies have a damage attribute
 
-                # Check if the player's health is less than or equal to zero
-                #if player.health <= 0:
-              # Call the death function
-                    #break  # Exit the loop if the player is dead
 
         # Check if the player has reached the right edge of the screen
         if player.rect.right >= width:
