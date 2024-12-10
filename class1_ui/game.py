@@ -6,7 +6,7 @@ from shed import shed
 from start_message import *
 import time
 from puzzle_message import *
-from death import *
+from death import death
 
 def character_selection_screen():
     # Screen setup
@@ -59,7 +59,7 @@ def character_selection_screen():
 
     return character_image_path  # Return the image path, not just the character name
 
-def game_loop():
+def game_loop(interface_callback):
     # Character selection
     selected_character = character_selection_screen()  # Returns image path
 
@@ -117,7 +117,7 @@ def game_loop():
 
     while True:
         if current_state == "main":
-            current_state = execute_game(player, selected_character)
+            current_state = execute_game(player, selected_character, interface_callback)
         elif current_state == "shed":
             current_state = shed(player, selected_character, bg_width, bg_height)
 
@@ -125,7 +125,7 @@ def game_loop():
 
 
 
-def execute_game(player: Player = None, character_image_path=None):
+def execute_game(player: Player = None, character_image_path=None,interface_callback=None):
     # SETUP:
 
     # setting up the background:
@@ -171,11 +171,18 @@ def execute_game(player: Player = None, character_image_path=None):
         # Handle events first
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                pygame.quit()
+                exit()
 
         # Calculate remaining time
         elapsed_time = time.time() - start_time
         remaining_time = max(0, countdown_time - int(elapsed_time))
+
+        # Check if the countdown has finished
+        if remaining_time == 0:
+            # Stop background music
+            pygame.mixer.music.stop()
+            return puzzle_message()
 
         # Clear the screen
         screen.fill((0, 0, 0))  # Fill with black or any color
@@ -196,11 +203,7 @@ def execute_game(player: Player = None, character_image_path=None):
         timer_text = font.render(f"{remaining_time // 60}:{remaining_time % 60:02d}", True, deep_black)
         screen.blit(timer_text, (width // 2 - timer_text.get_width() // 2, 10))  # Centered at the top
 
-        # Check if the countdown has finished
-        if remaining_time == 0:
-            # Stop background music
-            pygame.mixer.music.stop()
-            return puzzle_message()
+
 
         # Player shooting
         player.shoot(bullets)
@@ -244,7 +247,7 @@ def execute_game(player: Player = None, character_image_path=None):
 
         # Check if the player's health is less than or equal to zero, which means death time
         if player.health <= 0:
-            death()
+            death(interface_callback)
             player.health = 100
 
 
