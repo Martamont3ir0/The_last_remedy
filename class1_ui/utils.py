@@ -1,6 +1,28 @@
+"""
+For reusable helper functions.
+Functions that are generic and modular.
+"""
+
 import pygame
 
 from config import *
+
+def draw_slider(screen, rect, value, max_value, base_color, fill_color):
+    """
+    Draws a slider on the screen.
+
+    Parameters:
+        screen: pygame Surface
+        rect: pygame Rect for the slider
+        value: Current value of the slider
+        max_value: Maximum value of the slider
+        base_color: Background color of the slider
+        fill_color: Fill color of the slider
+    """
+    pygame.draw.rect(screen, base_color, rect)
+    fill_width = int((value / max_value) * rect.width)
+    pygame.draw.rect(screen, fill_color, (rect.x, rect.y, fill_width, rect.height))
+
 
 def draw_buttons (screen, text, rect, font,base_color, text_color, hover_color, mouse_pos, border_radius=15, padding=(20,10)):
     """
