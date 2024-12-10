@@ -4,8 +4,10 @@ from utils import *
 from utils import under_construction
 from player import Player
 from start_message import *
+from death import *
+from user_info import *
 
-def shed(player, selected_character, bg_width, bg_height):
+def shed(player, selected_character, bg_width):
     # Basic setup
     # setting up the background:
     background = pygame.image.load("img/thewastesbg.jpeg")
@@ -15,7 +17,7 @@ def shed(player, selected_character, bg_width, bg_height):
 
     # Initialize player if not already done
     if player is None:
-        player = Player(bg_width, bg_height, selected_character)
+        player = Player(bg_width, selected_character)
 
     player.rect.left = 0
     special_area = pygame.Rect(530, 30, 140, 140)
@@ -47,7 +49,8 @@ def shed(player, selected_character, bg_width, bg_height):
                 running = False
         # Show level start message
 
-        show_start_message(screen, level2_title, level2_description, background)
+        show_start_message(screen, level2_title, level2_description, background,player)
+
 
         if pygame.time.get_ticks() - start_time >= 6000:
             pygame.mixer.music.play(-1)  # Start playing music after 6 seconds
@@ -61,7 +64,7 @@ def shed(player, selected_character, bg_width, bg_height):
 
         clock.tick(fps)
         screen.blit(background, (0, 0))
-
+        user_info(player,screen,False)
         # Event handling
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

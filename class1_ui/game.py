@@ -7,6 +7,7 @@ from start_message import *
 import time
 from puzzle_message import *
 from death import *
+from user_info import *
 
 def character_selection_screen():
     # Screen setup
@@ -94,13 +95,19 @@ def game_loop():
     # Main loop
     running = True
     screen = pygame.display.set_mode(resolution)
+
+    # Create the player with the selected image path, and pass bg_width. Height is already defined.
+    player = Player(bg_width, selected_character)  # Pass image path directly
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
         #Show level start message
+        show_start_message(screen,level1_title,level1_description,background,player)
 
-        show_start_message(screen,level1_title,level1_description,background)
+
+
         # Check if 8 seconds have passed
         if pygame.time.get_ticks() - start_time >= 6000:
             pygame.mixer.music.play(-1)  # Start playing music after 6 seconds
@@ -110,8 +117,7 @@ def game_loop():
         # Update the display (if needed)
         pygame.display.flip()
 
-    # Create the player with the selected image path, and pass bg_width and bg_height
-    player = Player(bg_width, bg_height, selected_character)  # Pass image path directly
+
 
     current_state = "main"  # Start in the main area
 
@@ -119,7 +125,7 @@ def game_loop():
         if current_state == "main":
             current_state = execute_game(player, selected_character)
         elif current_state == "shed":
-            current_state = shed(player, selected_character, bg_width, bg_height)
+            current_state = shed(player, selected_character, bg_width)
 
 
 
@@ -134,7 +140,7 @@ def execute_game(player: Player = None, character_image_path=None):
 
     # Create the player with the selected character image
     if player is None:
-        player = Player(bg_width, bg_height, character_image_path)
+        player = Player(bg_width, character_image_path)
 
     # using the clock to control the time frame.
     clock = pygame.time.Clock()
@@ -145,7 +151,9 @@ def execute_game(player: Player = None, character_image_path=None):
 
     # CHANGED: Initialize the player if not already passed
     if player is None:
-        player = Player(bg_width, bg_height)  # Pass bg_width and bg_height
+        player = Player(bg_width)  # Pass bg_width. Height is already defined.
+
+
 
     # setting up the player
     player_group = pygame.sprite.Group()
@@ -162,6 +170,8 @@ def execute_game(player: Player = None, character_image_path=None):
 
     # Max countdown time for the user to survive
     countdown_time = 60
+
+
 
     running = True
     start_time = time.time()
@@ -190,6 +200,9 @@ def execute_game(player: Player = None, character_image_path=None):
         # Draw the background
         screen.blit(background, (bg_x, 0))
         screen.blit(background, (bg_x + bg_width, 0))
+
+        #Display player's info
+        user_info(player,screen,False)
 
         # Render the countdown timer
         font = pygame.font.Font(None, 46)  # Adjust font size as needed
@@ -241,6 +254,9 @@ def execute_game(player: Player = None, character_image_path=None):
             for drone in collided_enemies:
                 drone.kill() #kill the enemy so it doesn't affect more the player
                 print(player.health) #checking if health is being correctly messed with
+
+
+
 
         # Check if the player's health is less than or equal to zero, which means death time
         if player.health <= 0:

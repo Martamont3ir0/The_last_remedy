@@ -14,7 +14,7 @@ class Enemy(pygame.sprite.Sprite):
 
         # starting the enemy at a random valid location on the screen
         self.rect.x = random.randint(0, width - enemy_size[0])
-        self.rect.y = random.randint(0, height - enemy_size[-1])
+        self.rect.y = random.randint(0, 551)
 
         # setting a random initial speed for the enemy booo maybe different enemy types would be cool
         self.speed = random.randint(1, 3)
