@@ -66,6 +66,14 @@ def game_loop(interface_callback):
     # Debugging: Check if image path was correctly selected
     print(f"Character image path: {selected_character}")  # Debugging output
 
+    # SETUP:
+    # Load the background image and get its size (bg_width, bg_height)
+    background = pygame.image.load("img/backroundscenario.jpg")  # Make sure this path is correct
+    bg_width, bg_height = background.get_size()  # Get the dimensions of the background image
+
+    # Create the player with the selected image path, and pass bg_width and bg_height
+    player = Player(bg_width, selected_character)  # Pass image path directly
+
     # Show start message after character selection
     level1_title = "Level 1: 'The Map'"
     level1_description = [
@@ -78,10 +86,9 @@ def game_loop(interface_callback):
     #Stop background interface music
     pygame.mixer.music.stop()
 
-    # SETUP:
-    # Load the background image and get its size (bg_width, bg_height)
-    background = pygame.image.load("img/backroundscenario.jpg")  # Make sure this path is correct
-    bg_width, bg_height = background.get_size()  # Get the dimensions of the background image
+    screen = pygame.display.set_mode(resolution)
+    show_start_message(screen, level1_title, level1_description, background, player)
+
 
     # add city alarm music
     pygame.mixer.music.load("audio/city alarm.wav")
@@ -93,14 +100,14 @@ def game_loop(interface_callback):
 
     # Main loop
     running = True
-    screen = pygame.display.set_mode(resolution)
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
         #Show level start message
 
-        show_start_message(screen,level1_title,level1_description,background)
+
         # Check if 8 seconds have passed
         if pygame.time.get_ticks() - start_time >= 6000:
             pygame.mixer.music.play(-1)  # Start playing music after 6 seconds
@@ -109,9 +116,8 @@ def game_loop(interface_callback):
 
         # Update the display (if needed)
         pygame.display.flip()
+        pygame.time.delay(30) #delay to reduce resource usage
 
-    # Create the player with the selected image path, and pass bg_width and bg_height
-    player = Player(bg_width, bg_height, selected_character)  # Pass image path directly
 
     current_state = "main"  # Start in the main area
 
