@@ -12,7 +12,7 @@ shake_intensity = 5  # Maximum pixels to shake
 
 # making Player a child of the Sprite class
 class Player(pygame.sprite.Sprite):
-    def __init__(self, bg_width, bg_height,character_image_path):  # CHANGED: Add bg_width and bg_height as arguments
+    def __init__(self, bg_width,character_image_path):
         super().__init__()
 
         # VISUAL VARIABLES
@@ -29,7 +29,7 @@ class Player(pygame.sprite.Sprite):
 
         # NEW: Store background dimensions
         self.bg_width = bg_width
-        self.bg_height = bg_height
+        self.bg_height = 551
 
 
 

@@ -28,6 +28,6 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.y += int(self.speed * math.sin(self.direction))
 
         # killing the bullet if it goes off-screen.
-        if self.rect.x < 0 or self.rect.x > width or self.rect.y < 0 or self.rect.y > height:
+        if self.rect.x < 0 or self.rect.x > width or self.rect.y < 0 or self.rect.y > 551:
             self.kill()
 

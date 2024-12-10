@@ -1,18 +1,23 @@
 import pygame
 from config import *
 from utils import *
+from user_info import *
 
-def show_start_message(screen, level_title,level_description, background):
+def show_start_message(screen, level_title,level_description, background,player):
     """
 
     :param screen:
     :param level_title: string for level title
     :param level_description: string for level description
     :param background: image path loaded and ready to be displayed on the background
+    :param:player in question, for the function user_info to work when called
     :return: shown message and background displayed
     """
     # setting up the background:
     screen.blit(background, (0, 0))
+
+    #Displaying where the user info will be but without the info yet
+    user_info(player,screen,True)
 
     # Display a start message
     font = pygame.font.Font(None, 26)
