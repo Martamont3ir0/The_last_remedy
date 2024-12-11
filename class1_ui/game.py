@@ -7,6 +7,7 @@ from start_message import *
 import time
 from puzzle_message import *
 from death import death
+from user_info import *
 
 def character_selection_screen():
     # Screen setup
@@ -71,7 +72,7 @@ def game_loop(interface_callback):
     background = pygame.image.load("img/backroundscenario.jpg")  # Make sure this path is correct
     bg_width, bg_height = background.get_size()  # Get the dimensions of the background image
 
-    # Create the player with the selected image path, and pass bg_width and bg_height
+    # Create the player with the selected image path, and pass bg_width. bg_height is already defined in the function player.
     player = Player(bg_width, selected_character)  # Pass image path directly
 
     # Show start message after character selection
@@ -125,7 +126,7 @@ def game_loop(interface_callback):
         if current_state == "main":
             current_state = execute_game(player, selected_character, interface_callback)
         elif current_state == "shed":
-            current_state = shed(player, selected_character, bg_width, bg_height)
+            current_state = shed(player, selected_character, bg_width)
 
 
 
@@ -140,7 +141,7 @@ def execute_game(player: Player = None, character_image_path=None,interface_call
 
     # Create the player with the selected character image
     if player is None:
-        player = Player(bg_width, bg_height, character_image_path)
+        player = Player(bg_width, character_image_path)
 
     # using the clock to control the time frame.
     clock = pygame.time.Clock()
@@ -151,7 +152,7 @@ def execute_game(player: Player = None, character_image_path=None,interface_call
 
     # CHANGED: Initialize the player if not already passed
     if player is None:
-        player = Player(bg_width, bg_height)  # Pass bg_width and bg_height
+        player = Player(bg_width)  # Pass bg_width. bg_height is already defined in the function player.
 
     # setting up the player
     player_group = pygame.sprite.Group()
@@ -190,8 +191,11 @@ def execute_game(player: Player = None, character_image_path=None,interface_call
             pygame.mixer.music.stop()
             return puzzle_message()
 
-        # Clear the screen
+
+        #Clear the screen
         screen.fill((0, 0, 0))  # Fill with black or any color
+
+
 
         # **Changed Line: Move the background as the player moves to the right**
         bg_x -= player.speed
@@ -204,11 +208,13 @@ def execute_game(player: Player = None, character_image_path=None,interface_call
         screen.blit(background, (bg_x, 0))
         screen.blit(background, (bg_x + bg_width, 0))
 
+        #Displaying player's info
+        user_info(player, screen, False)
+
         # Render the countdown timer
         font = pygame.font.Font(None, 46)  # Adjust font size as needed
         timer_text = font.render(f"{remaining_time // 60}:{remaining_time % 60:02d}", True, deep_black)
         screen.blit(timer_text, (width // 2 - timer_text.get_width() // 2, 10))  # Centered at the top
-
 
 
         # Player shooting
