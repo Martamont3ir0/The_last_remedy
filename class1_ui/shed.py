@@ -47,6 +47,7 @@ def shed(player, selected_character, bg_width):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+                pygame.quit()
         # Show level start message
 
         show_start_message(screen, level2_title, level2_description, background,player)

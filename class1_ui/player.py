@@ -26,10 +26,19 @@ class Player(pygame.sprite.Sprite):
         self.speed = 5
         self.health = 100
         self.bullet_cooldown = 0
+        self.is_invincible = False
+
 
         # NEW: Store background dimensions
         self.bg_width = bg_width
         self.bg_height = 551
+
+    def take_damage(self,damage,is_invincible):
+        if not is_invincible:
+            self.health -= damage
+        else:
+            return self.health
+
 
 
 

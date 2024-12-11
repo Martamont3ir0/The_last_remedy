@@ -189,7 +189,7 @@ def execute_game(player: Player = None, character_image_path=None,interface_call
         if remaining_time == 0:
             # Stop background music
             pygame.mixer.music.stop()
-            return puzzle_message()
+            puzzle_message(background,player)
 
 
         #Clear the screen
@@ -242,7 +242,7 @@ def execute_game(player: Player = None, character_image_path=None,interface_call
         for bullet in bullets:
             collided_enemies = pygame.sprite.spritecollide(bullet, enemies, False)
             for enemy in collided_enemies:
-                enemy.health -= 5
+                enemy.health -= 10
                 bullet.kill()
                 if enemy.health <= 0:
                     enemy.kill()
@@ -252,7 +252,8 @@ def execute_game(player: Player = None, character_image_path=None,interface_call
 
         # Check if the player has collided with any enemies
         if collided_enemies:
-            player.health -= 25#example of damage from enemy
+            damage = 25#example of damage from enemy
+            player.take_damage(damage,False)#making player's health influenced by this damage, depending whether or not they are invincible
             for drone in collided_enemies:
                 drone.kill() #kill the enemy so it doesn't affect more the player
                 print(player.health) #checking if health is being correctly messed with
