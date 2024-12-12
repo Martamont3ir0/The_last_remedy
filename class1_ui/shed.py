@@ -52,9 +52,6 @@ def shed(player, selected_character, bg_width):
 
         show_start_message(screen, level2_title, level2_description, background,player)
 
-
-        if pygame.time.get_ticks() - start_time >= 6000:
-            pygame.mixer.music.play(-1)  # Start playing music after 6 seconds
         if pygame.time.get_ticks() - start_time >= 10000:  # After 10 seconds, the loop of start message ends
             running = False
 
@@ -62,7 +59,7 @@ def shed(player, selected_character, bg_width):
         pygame.display.flip()
 
     while True:
-
+        pygame.mixer.music.play(-1)  # Start playing music in a loop
         clock.tick(fps)
         screen.blit(background, (0, 0))
         user_info(player,screen,False)

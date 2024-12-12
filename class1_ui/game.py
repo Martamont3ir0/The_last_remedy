@@ -88,6 +88,7 @@ def game_loop(interface_callback):
     pygame.mixer.music.stop()
 
     screen = pygame.display.set_mode(resolution)
+    #Show level start message
     show_start_message(screen, level1_title, level1_description, background, player)
 
 
@@ -106,20 +107,18 @@ def game_loop(interface_callback):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-        #Show level start message
+                pygame.quit()
 
-
-        # Check if 8 seconds have passed
-        if pygame.time.get_ticks() - start_time >= 6000:
-            pygame.mixer.music.play(-1)  # Start playing music after 6 seconds
         if pygame.time.get_ticks() - start_time >= 10000: #After 10 seconds, the loop of start message ends
             running = False
+
+
 
         # Update the display (if needed)
         pygame.display.flip()
         pygame.time.delay(30) #delay to reduce resource usage
 
-
+    pygame.mixer.music.play(-1)  # Start playing  in a loop
     current_state = "main"  # Start in the main area
 
     while True:
@@ -189,7 +188,7 @@ def execute_game(player: Player = None, character_image_path=None,interface_call
         if remaining_time == 0:
             # Stop background music
             pygame.mixer.music.stop()
-            puzzle_message(background,player)
+            puzzle_message(background,player,character_image_path,bg_width)
 
 
         #Clear the screen
@@ -252,7 +251,7 @@ def execute_game(player: Player = None, character_image_path=None,interface_call
 
         # Check if the player has collided with any enemies
         if collided_enemies:
-            damage = 25#example of damage from enemy
+            damage = 20#example of damage from enemy
             player.take_damage(damage,False)#making player's health influenced by this damage, depending whether or not they are invincible
             for drone in collided_enemies:
                 drone.kill() #kill the enemy so it doesn't affect more the player
