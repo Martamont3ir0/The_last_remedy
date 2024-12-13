@@ -1,4 +1,6 @@
 import pygame
+
+from backpack import *
 from config import *
 from utils import *
 from utils import under_construction
@@ -6,7 +8,6 @@ from player import Player
 from start_message import *
 from death import *
 from user_info import *
-from backpack import *
 
 def shed(player, selected_character, bg_width,overlay_visible):
     # Basic setup
@@ -43,7 +44,7 @@ def shed(player, selected_character, bg_width,overlay_visible):
     # Main loop
     running = True
 
-    while running:
+    while running and overlay_visible:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -71,7 +72,7 @@ def shed(player, selected_character, bg_width,overlay_visible):
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
                 if backpack_rect.collidepoint(event.pos):# Check if backpack is clicked
-                    backpack(player,selected_character,bg_width)#Enter the backpack
+                    backpack(screen,player,selected_character,bg_width)#Enter the backpack
 
         player_group.draw(screen)  # Draw the player on the screen
         # Update the player's position
@@ -83,10 +84,10 @@ def shed(player, selected_character, bg_width,overlay_visible):
             # Create a white overlay
             overlay = pygame.Surface(resolution)
             overlay.fill(white)  # Fill with white
-            overlay.set_alpha(200)  # Set transparency (0-255)
+            overlay.set_alpha(240)  # Set transparency (0-255)
             # Blit the overlay on top of the image
             screen.blit(overlay, (0, 0))
-            font= pygame.font.Font(None, 16)
+            font= pygame.font.Font(None, 24ss)
             instructions = font.render("Looks like the sun is really strong, how are you going to see?", True, deep_black)
             instructions_rect = instructions.get_rect()
             instructions_rect.center = (width // 2, 50)
