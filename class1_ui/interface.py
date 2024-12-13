@@ -126,7 +126,7 @@ def interface():
         quit_hover = pygame.Rect((resolution[0] // 4) * 3 - 90, 600 - 30, 180, 60)
 
         draw_buttons(
-            screen, "Rules", rules_hover, bookantiqua,
+            screen, "Story", rules_hover, bookantiqua,
             base_color=(0, 150, 0), text_color=white,
             hover_color=(50, 255, 50), mouse_pos=mouse
         )

@@ -51,5 +51,18 @@ button_settings = {
     "default_border_radius": 10,
     "default_padding": (20, 10),
 }
+#PUZZLE CONFIGURATION
+puzzle_colors=[
+    (255,0,0),
+    (0,255,0),
+    (0,0,255),
+    (255,255,0)
+]
 
+puzzle_wire_positions=[
+    (100,200), (100,300),(100,400), (100,500)
+]
 
+puzzle_node_positions=[
+    (600,200), (600,300), (600,400), (600,500)
+]

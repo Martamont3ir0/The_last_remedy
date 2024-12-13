@@ -125,7 +125,7 @@ def game_loop(interface_callback):
         if current_state == "main":
             current_state = execute_game(player, selected_character, interface_callback)
         elif current_state == "shed":
-            current_state = shed(player, selected_character, bg_width)
+            current_state = shed(player, selected_character, bg_width,True)
 
 
 
@@ -268,7 +268,7 @@ def execute_game(player: Player = None, character_image_path=None,interface_call
         if player.rect.right >= width:
             # Stop background music
             pygame.mixer.music.stop()
-            return "shed"
+            shed(player,character_image_path,bg_width,True)
 
         # Update the display once after all drawing is done
         pygame.display.flip()

@@ -3,15 +3,21 @@ from game import *
 from config import *
 from shed import *
 
-def puzzle_game(screen):
+def puzzle_game(screen,player,selected_character,bg_width):
     """
     puzzle that consists on a wire connection:
     the player connects wires to match nodes.
     parameters:
+    -screen:
+    -player:
+    -selected_character:
+    -bg_width:
+
     -dragging_wire: tracks which wire the player is currently dragging.
     -dragging_offset: stores offset between the players click position and the wires position.
     - connections: list to track the connections between wires and nodes.
     """
+
 
     #configuration values to use
     colors= puzzle_colors
@@ -63,14 +69,23 @@ def puzzle_game(screen):
         if solved:
             #puzzle is completed successfully
             print("Puzzle Solved!")
-            return "shed" #proceed to the shed after solving the puzzle
+            shed(player, selected_character, bg_width,True) #proceed to the shed after solving the puzzle
 
+        puzzle_bg = pygame.image.load("img/cratebg.png")
         #draw the puzzle
         screen.fill((30,30,30))
+        #display of instructions
         font= pygame.font.Font(None, 36)
-        instructions = font.render("Connect the wires to the matching nodes!", True, (255, 255, 255))
-        screen.blit(instructions, (50, 50))
+        instructions = font.render("To unlock the crate and get the map of The Wastes...", True, deep_black)
+        instructions2 = font.render("...connect the colors to prove you're not a ROBOT!",True, deep_black)
+        instructions_rect = instructions.get_rect()
+        instructions2_rect = instructions2.get_rect()
+        instructions_rect.center = (width//2, 100)
+        instructions2_rect.center = (width // 2, 600)
 
+        screen.blit(puzzle_bg,(0,0))
+        screen.blit(instructions, instructions_rect)
+        screen.blit(instructions2, instructions2_rect)
         #draw wires
         for i, (x,y) in enumerate(wire_positions):
             pygame.draw.circle(screen, colors[i], (x,y), 15)
@@ -93,6 +108,12 @@ def puzzle_game(screen):
         clock.tick(60)
 
 def show_balloon(screen, background):
+    """
+
+    :param screen:
+    :param background:
+    :return:
+    """
     # Constants
     balloon_start_y = -105
     balloon_start_x = 400
@@ -106,6 +127,14 @@ def show_balloon(screen, background):
 
 
 def puzzle_message(background, player, selected_character, bg_width):
+    """
+
+    :param background:
+    :param player:
+    :param selected_character:
+    :param bg_width:
+    :return:
+    """
     screen = pygame.display.set_mode(resolution)
     balloon_image, balloon_rect = show_balloon(screen, background) #getting the values that were returned from the show_balloon function
     clock = pygame.time.Clock()
@@ -148,6 +177,7 @@ def puzzle_message(background, player, selected_character, bg_width):
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
                 if balloon_dropped and balloon_rect.collidepoint(event.pos):
-                    shed(player, selected_character, bg_width)
+                    puzzle_game(screen,player,selected_character, bg_width)
+
 
 
