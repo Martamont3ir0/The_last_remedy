@@ -24,7 +24,7 @@ class PowerUp(ABC):
         pass
 
     @abstractmethod
-    def is_active(self):
+    def is_active(self,player):
         """
         Check if the power-up is currently active.
         """
@@ -49,7 +49,7 @@ class SpeedBoost(PowerUp):
     def duration(self):
         return self._duration
 
-    def is_active(self):
+    def is_active(self,player):
         if self._is_active and (time.time() - self._start_time >= self._duration):
             self.remove(player)  # Automatically remove if duration has passed
         return self._is_active
@@ -73,7 +73,7 @@ class Invincibility(PowerUp):
     def duration(self):
         return self._duration
 
-    def is_active(self):
+    def is_active(self,player):
         if self._is_active and (time.time() - self._start_time >= self._duration):
             self.remove(player)  # Automatically remove if duration has passed
         return self._is_active
@@ -96,6 +96,6 @@ class HealthRegeneration(PowerUp):
     def duration(self):
         return self._duration
 
-    def is_active(self):
+    def is_active(self,player):
         return self._is_active
 

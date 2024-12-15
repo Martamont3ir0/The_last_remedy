@@ -23,14 +23,19 @@ def user_info(player,screen,during_message):
         screen.blit(data,data_rect)
 
     else:
-        font2 = pygame.font.Font(None, 25)
+        font2 = pygame.font.Font(None, 24)
         health_text = f"Health: {player.health}%"
         health_text = font2.render(health_text, True, deep_black)
         health_rect = health_text.get_rect()
-        health_rect.center = (80, 612)
+        health_rect.center = (90, 620)
         screen.blit(health_text, health_rect)
-        money_text = f"Money:" #{player.money}%"
+        money_text = f"Money: {player.money} coins"
         money_text = font2.render(money_text, True, deep_black)
         money_rect = health_text.get_rect()
-        money_rect.center = (80, 642)
+        money_rect.center = (90, 675)
         screen.blit(money_text, money_rect)
+        weapon_text = f"Current weapon: {player.weapon}"
+        weapon_text = font2.render(weapon_text, True, deep_black)
+        weapon_rect = weapon_text.get_rect()
+        weapon_rect.center = (545, 620)
+        screen.blit(weapon_text, weapon_rect)

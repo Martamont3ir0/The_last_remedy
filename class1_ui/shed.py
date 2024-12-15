@@ -1,13 +1,11 @@
 import pygame
-
-from backpack import *
 from config import *
 from utils import *
-from utils import under_construction
 from player import Player
 from start_message import *
 from death import *
 from user_info import *
+from backpack import *
 
 def shed(player, selected_character, bg_width,overlay_visible):
     # Basic setup
