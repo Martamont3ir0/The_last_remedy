@@ -87,7 +87,7 @@ def shed(player, selected_character, bg_width,overlay_visible):
             overlay.set_alpha(240)  # Set transparency (0-255)
             # Blit the overlay on top of the image
             screen.blit(overlay, (0, 0))
-            font= pygame.font.Font(None, 24ss)
+            font= pygame.font.Font(None, 24)
             instructions = font.render("Looks like the sun is really strong, how are you going to see?", True, deep_black)
             instructions_rect = instructions.get_rect()
             instructions_rect.center = (width // 2, 50)

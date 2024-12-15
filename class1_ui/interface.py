@@ -1,10 +1,4 @@
-"""
-contains the main user interface logic:
--menus
--navigation
--screen
--Main Menu, rules screen, credits
-"""
+from death import death
 import pygame
 from utils import (
     draw_buttons,
@@ -14,13 +8,20 @@ from utils import (
     under_construction
 )
 from config import*
-from game import game_loop
-from death import death
+from game import *
+
 
 
 
 
 def interface():
+    """
+contains the main user interface logic:
+-menus
+-navigation
+-screen
+-Main Menu, rules screen, credits
+"""
     # Initialize Pygame
     pygame.init()
 
@@ -74,7 +75,7 @@ def interface():
             elif ev.type == pygame.MOUSEBUTTONUP:
                 # Handle button clicks
                 if start_hover.collidepoint(mouse):
-                    game_loop()
+                    game_loop(interface)
                     return
                 elif  credits_hover.collidepoint(mouse):
                     credits_(screen)

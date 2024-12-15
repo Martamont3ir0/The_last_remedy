@@ -1,4 +1,4 @@
-# Config file for global constants and settings
+  # Config file for global constants and settings
 
 # COLORS
 dark_red = (138, 0, 0)          # Dark red for buttons
@@ -51,18 +51,27 @@ button_settings = {
     "default_border_radius": 10,
     "default_padding": (20, 10),
 }
-#PUZZLE CONFIGURATION
+
+#puzzle configuration
+#red, green, blue, yellow, cyan,magenta, orange
 puzzle_colors=[
     (255,0,0),
     (0,255,0),
     (0,0,255),
-    (255,255,0)
+    (255,255,0),
+    (0,255,255),
+    (255,0,255),
+    (255,165,0)
 ]
 
+#wire starting positions: left side
 puzzle_wire_positions=[
-    (100,200), (100,300),(100,400), (100,500)
+    (100, 200), (100, 280), (100, 360),
+    (100, 440), (100, 520), (100, 600), (100, 680)
 ]
 
+#node positions:right side
 puzzle_node_positions=[
-    (600,200), (600,300), (600,400), (600,500)
+    (600, 200), (600, 280), (600, 360),
+    (600, 440), (600, 520), (600, 600), (600, 680)
 ]

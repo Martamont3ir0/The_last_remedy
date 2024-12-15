@@ -2,116 +2,185 @@ import pygame
 from game import *
 from config import *
 from shed import *
+import random # For shuffling nodes
+from class1_ui.interface import interface
 
 def puzzle_game(screen,player,selected_character,bg_width):
     """
-    puzzle that consists on a wire connection:
-    the player connects wires to match nodes.
-    parameters:
-    -screen:
-    -player:
-    -selected_character:
-    -bg_width:
+        Displays a wire-connecting puzzle where the player connects wires to shuffled nodes.
 
-    -dragging_wire: tracks which wire the player is currently dragging.
-    -dragging_offset: stores offset between the players click position and the wires position.
-    - connections: list to track the connections between wires and nodes.
+        The player must:
+        - Drag and connect wires to their matching colored nodes.
+        - Complete the puzzle within a 16-second timer.
+
+        Key Features:
+        - A timer at the top tracks the remaining time.
+        - If the player matches wires incorrectly, the wire returns to its original position.
+        - If the time runs out, a retry option is displayed to restart or exit.
+
+        Args:
+            screen (pygame.Surface): The game screen surface to render the puzzle.
+            player:
+            selected_character:
+            bg_width:
+
+        Returns:
+            function shed if the puzzle is solved, or triggers a retry/reset if the timer runs out.
     """
 
+    def show_retry_prompt(screen):
+        """
+         Displays a retry prompt when the puzzle timer runs out.
 
-    #configuration values to use
-    colors= puzzle_colors
-    wire_positions= puzzle_wire_positions.copy()
-    node_positions= puzzle_node_positions
+         Args:
+             screen (pygame.Surface): The game screen surface to display the prompt.
 
-    #variables to track the players actions
+         Returns:
+             str: "retry" to restart the puzzle, or "main" to return to the main menu.
+         """
+        font = pygame.font.Font(None, 48)
+        prompt_text = font.render("Time's up! Want to try again?", True, (255, 255, 255))
+        yes_button = pygame.Rect(width // 2 - 150, 400, 100, 50)
+        no_button = pygame.Rect(width // 2 + 50, 400, 100, 50)
+
+        while True:
+            mouse_pos = pygame.mouse.get_pos()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if yes_button.collidepoint(mouse_pos):
+                        interface()
+                    if no_button.collidepoint(mouse_pos):
+                        pygame.quit()
+                        exit()
+
+            # Draw the prompt
+            screen.fill((30, 30, 30))
+            screen.blit(prompt_text, (width // 2 - prompt_text.get_width() // 2, 300))
+
+            # Draw buttons
+            pygame.draw.rect(screen, (0, 255, 0), yes_button)  # Green for "Yes"
+            pygame.draw.rect(screen, (255, 0, 0), no_button)  # Red for "No"
+
+            # Draw button text
+            yes_text = font.render("Yes", True, (0, 0, 0))
+            no_text = font.render("No", True, (0, 0, 0))
+            screen.blit(yes_text, (
+                yes_button.centerx - yes_text.get_width() // 2, yes_button.centery - yes_text.get_height() // 2))
+            screen.blit(no_text,
+                        (no_button.centerx - no_text.get_width() // 2, no_button.centery - no_text.get_height() // 2))
+
+            pygame.display.flip()
+
+    # Configuration values
+    colors = puzzle_colors
+    wire_positions = puzzle_wire_positions.copy()
+    node_positions = puzzle_node_positions.copy()
+
+    # Shuffle the nodes for added difficulty
+    random.shuffle(node_positions)
+
+    # Variables to track player actions
     dragging_wire = None
-    dragging_offset= (0,0)#used to make the dragging smooth
-    connections= [None]* len(colors)
+    dragging_offset = (0, 0)  # Smooth dragging
+    connections = [None] * len(colors)
 
-
-    running= True
-    clock= pygame.time.Clock()
-
+    running = True
+    clock = pygame.time.Clock()
+    start_time = pygame.time.get_ticks()  # Timer start point
+    time_limit = 30000  # 30 seconds in milliseconds
+    puzzle_bg = pygame.image.load("img/cratebg.png")
     while running:
-        mouse_pos= pygame.mouse.get_pos()
+        screen.blit(puzzle_bg,(0,0))
+        current_time = pygame.time.get_ticks()
+        elapsed_time = current_time - start_time
+        remaining_time = max(0, time_limit - elapsed_time)
+
+        mouse_pos = pygame.mouse.get_pos()
         for event in pygame.event.get():
-            if event.type==pygame.QUIT:
+            if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
 
-            if event.type==pygame.MOUSEBUTTONDOWN:
+            # Start dragging wire
+            if event.type == pygame.MOUSEBUTTONDOWN:
                 for i, (x, y) in enumerate(wire_positions):
                     if (x - 15 <= mouse_pos[0] <= x + 15) and (y - 15 <= mouse_pos[1] <= y + 15):
                         dragging_wire = i
                         dragging_offset = (mouse_pos[0] - x, mouse_pos[1] - y)
 
-            if event.type==pygame.MOUSEBUTTONUP:
+            # Drop the wire
+            if event.type == pygame.MOUSEBUTTONUP:
                 if dragging_wire is not None:
+                    connected = False
                     for i, (x, y) in enumerate(node_positions):
+                        # Check if the wire matches the correct color node
                         if (x - 15 <= mouse_pos[0] <= x + 15) and (y - 15 <= mouse_pos[1] <= y + 15):
-                            if connections[i] is None:  # Only connect if the node is not already connected
+                            if connections[i] is None and i == dragging_wire:  # Ensure it's the correct node
                                 connections[i] = dragging_wire
+                                connected = True
                                 break
-                    dragging_wire = None
 
-        #update dragging wire position:
-        if dragging_wire is not None:
-            wire_positions[dragging_wire] = (mouse_pos[0] - dragging_offset[0], mouse_pos[1] - dragging_offset[1])
+                    if not connected:
+                        # Reset wire to its original position
+                        wire_positions[dragging_wire] = puzzle_wire_positions[dragging_wire]
 
-        #check if the puzzle is solved
-        solved= True
-        for i, connection in enumerate(connections):
-            if connection is None or connection!=i:
-                solved= False
-                break
+                    dragging_wire = None  # Reset dragging state
+
+        # Check if the timer has run out
+        if remaining_time == 0:
+            show_retry_prompt(screen)
+
+        # Check if the puzzle is solved
+        solved = all(connections[i] == i for i in range(len(connections)))
 
         if solved:
-            #puzzle is completed successfully
             print("Puzzle Solved!")
             shed(player, selected_character, bg_width,True) #proceed to the shed after solving the puzzle
 
-        puzzle_bg = pygame.image.load("img/cratebg.png")
-        #draw the puzzle
-        screen.fill((30,30,30))
-        #display of instructions
-        font= pygame.font.Font(None, 36)
-        instructions = font.render("To unlock the crate and get the map of The Wastes...", True, deep_black)
-        instructions2 = font.render("...connect the colors to prove you're not a ROBOT!",True, deep_black)
-        instructions_rect = instructions.get_rect()
-        instructions2_rect = instructions2.get_rect()
-        instructions_rect.center = (width//2, 100)
-        instructions2_rect.center = (width // 2, 600)
 
-        screen.blit(puzzle_bg,(0,0))
-        screen.blit(instructions, instructions_rect)
-        screen.blit(instructions2, instructions2_rect)
-        #draw wires
-        for i, (x,y) in enumerate(wire_positions):
-            pygame.draw.circle(screen, colors[i], (x,y), 15)
-            if connections[i] is not None:
-                node_x, node_y= node_positions[connections[i]]
-                pygame.draw.line(screen, colors[i], (x, y), (node_x, node_y), 3)
+        # Display the timer
+        timer_font = pygame.font.Font(None, 35)
+        timer_text = timer_font.render(f"Time Left: {remaining_time // 1000}", True, white)
+        timer_rect = timer_text.get_rect(center=(width // 2, 35 ))
+        screen.blit(timer_text, timer_rect)
 
-        #dragging the wires
-        if dragging_wire is not None:
-            pygame.draw.line(screen, colors[dragging_wire], wire_positions[dragging_wire], mouse_pos, 3 )
-
-        #draw nodes
-        for i, (x, y) in enumerate(node_positions):
+        # Draw wires
+        for i, (x, y) in enumerate(wire_positions):
             pygame.draw.circle(screen, colors[i], (x, y), 15)
             if connections[i] is not None:
-                wire_x, wire_y = wire_positions[connections[i]]
-                pygame.draw.line(screen, colors[i], (x, y), (wire_x, wire_y), 3)
+                node_x, node_y = node_positions[i]
+                pygame.draw.line(screen, colors[i], (x, y), (node_x, node_y), 3)
+
+        # Draw dragging wire
+        if dragging_wire is not None:
+            pygame.draw.line(screen, colors[dragging_wire], wire_positions[dragging_wire], mouse_pos, 3)
+
+        # Draw nodes
+        for i, (x, y) in enumerate(node_positions):
+            pygame.draw.circle(screen, colors[i], (x, y), 15)
+
+
+        #display of instructions
+        font= pygame.font.Font(None, 33)
+        instructions = font.render("To unlock the crate and get the map of The Wastes,", True, deep_black)
+        instructions2 = font.render("connect the colors to prove you're not a ROBOT!",True, deep_black)
+        instructions_rect = instructions.get_rect()
+        instructions2_rect = instructions2.get_rect()
+        instructions_rect.center = (width//2, 95)
+        instructions2_rect.center = (width // 2, 135)
+
+
+        screen.blit(instructions, instructions_rect)
+        screen.blit(instructions2, instructions2_rect)
 
         pygame.display.flip()
         clock.tick(60)
 
-def show_balloon(screen, background):
+def show_balloon():
     """
-
-    :param screen:
-    :param background:
     :return:
     """
     # Constants
@@ -136,7 +205,7 @@ def puzzle_message(background, player, selected_character, bg_width):
     :return:
     """
     screen = pygame.display.set_mode(resolution)
-    balloon_image, balloon_rect = show_balloon(screen, background) #getting the values that were returned from the show_balloon function
+    balloon_image, balloon_rect = show_balloon() #getting the values that were returned from the show_balloon function
     clock = pygame.time.Clock()
     balloon_speed = 9
     balloon_end_y = 437
