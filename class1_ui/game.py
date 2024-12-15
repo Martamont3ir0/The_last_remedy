@@ -127,54 +127,42 @@ def game_loop(interface_callback):
         elif current_state == "shed":
             current_state = shed(player, selected_character, bg_width,True)
 
-
-
-
-
-def execute_game(player: Player = None, character_image_path=None,interface_callback=None):
+def execute_game(player: Player = None, character_image_path=None, interface_callback=None):
     # SETUP:
 
-    # setting up the background:
+    # Setting up the background
     background = pygame.image.load("img/backroundscenario.jpg")
-    bg_width, bg_height = background.get_size()  # **New Line: Get the original size of the background image**
+    bg_width, bg_height = background.get_size()
 
     # Create the player with the selected character image
     if player is None:
         player = Player(bg_width, character_image_path)
 
-    # using the clock to control the time frame.
+    # Screen setup
     clock = pygame.time.Clock()
-
-    # screen setup:
     screen = pygame.display.set_mode(resolution)
     pygame.display.set_caption("The Last Remedy")
 
-    # CHANGED: Initialize the player if not already passed
-    if player is None:
-        player = Player(bg_width)  # Pass bg_width. bg_height is already defined in the function player.
-
-    # setting up the player
+    # Initialize groups
     player_group = pygame.sprite.Group()
     player_group.add(player)
 
     bullets = pygame.sprite.Group()
+    lasers = pygame.sprite.Group()  # Group for lasers
     enemies = pygame.sprite.Group()
 
-    # before starting our main loop, setup the enemy cooldown variable
     enemy_cooldown = 0
+    bg_x = 0
 
-    # **New Line: Scroll position for the background**: Track how much the background has moved
-    bg_x = 0  # **New Line: Initial position of the background**
-
-    # Max countdown time for the user to survive
-    countdown_time = 60
+    # Max countdown time for survival
+    countdown_time = 10
+    start_time = time.time()
 
     running = True
-    start_time = time.time()
     while running:
         clock.tick(fps)
 
-        # Handle events first
+        # Handle events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -184,60 +172,53 @@ def execute_game(player: Player = None, character_image_path=None,interface_call
         elapsed_time = time.time() - start_time
         remaining_time = max(0, countdown_time - int(elapsed_time))
 
-        # Check if the countdown has finished
+        # Check if the timer runs out
         if remaining_time == 0:
-            # Stop background music
             pygame.mixer.music.stop()
-            puzzle_message(background,player,character_image_path,bg_width)
+            puzzle_message(background, player, character_image_path, bg_width)
 
+        # Clear the screen
+        screen.fill((0, 0, 0))
 
-        #Clear the screen
-        screen.fill((0, 0, 0))  # Fill with black or any color
-
-
-
-        # **Changed Line: Move the background as the player moves to the right**
+        # Move background for parallax effect
         bg_x -= player.speed
-
-        # Reset background position for seamless looping
         if bg_x <= -bg_width:
             bg_x = 0
-
-        # Draw the background
         screen.blit(background, (bg_x, 0))
         screen.blit(background, (bg_x + bg_width, 0))
 
-        #Displaying player's info
+        # Display player info
         user_info(player, screen, False)
 
-        # Render the countdown timer
-        font = pygame.font.Font(None, 46)  # Adjust font size as needed
-        timer_text = font.render(f"{remaining_time // 60}:{remaining_time % 60:02d}", True, deep_black)
-        screen.blit(timer_text, (width // 2 - timer_text.get_width() // 2, 10))  # Centered at the top
+        # Render countdown timer
+        font = pygame.font.Font(None, 46)
+        timer_text = font.render(f"{remaining_time // 10}:{remaining_time % 10:02d}", True, deep_black)
+        screen.blit(timer_text, (width // 2 - timer_text.get_width() // 2, 10))
 
+        # Player shooting (bullets and lasers)
+        keys = pygame.key.get_pressed()
+        player.shoot(bullets, lasers)  # Pass keys to handle laser shooting
 
-        # Player shooting
-        player.shoot(bullets)
-
-        # Spawning enemies every two seconds
+        # Spawn enemies
         if enemy_cooldown <= 0:
             enemy = Enemy()
             enemies.add(enemy)
-            enemy_cooldown = fps * 2  # Reset cooldown
-
+            enemy_cooldown = fps * 2  # Cooldown reset
         enemy_cooldown -= 1
 
-        # Update groups
+        # Update all groups
         player_group.update()
-        enemies.update(player)
         bullets.update()
+        lasers.update(player)
+        enemies.update(player)
 
-        # Draw the player and enemies
+        # Draw everything
         player_group.draw(screen)
         enemies.draw(screen)
         bullets.draw(screen)
+        lasers.draw(screen)
 
-        # Handle bullet collisions
+        # Bullet collisions
         for bullet in bullets:
             collided_enemies = pygame.sprite.spritecollide(bullet, enemies, False)
             for enemy in collided_enemies:
@@ -246,31 +227,29 @@ def execute_game(player: Player = None, character_image_path=None,interface_call
                 if enemy.health <= 0:
                     enemy.kill()
 
-        # Handle enemy/player collisions
+        # Laser collisions
+        for laser in lasers:
+            collided_enemies = pygame.sprite.spritecollide(laser, enemies, False)
+            for enemy in collided_enemies:
+                enemy.health -= 30  # Lasers deal more damage
+                if enemy.health <= 0:
+                    enemy.kill()
+
+        # Handle player collisions with enemies
         collided_enemies = pygame.sprite.spritecollide(player, enemies, False)
-
-        # Check if the player has collided with any enemies
         if collided_enemies:
-            damage = 20#example of damage from enemy
-            player.take_damage(damage,False)#making player's health influenced by this damage, depending whether or not they are invincible
+            player.take_damage(20, False)
             for drone in collided_enemies:
-                drone.kill() #kill the enemy so it doesn't affect more the player
-                print(player.health) #checking if health is being correctly messed with
+                drone.kill()
 
-        # Check if the player's health is less than or equal to zero, which means death time
+        # Check player health
         if player.health <= 0:
             death(interface_callback)
             player.health = 100
 
-
-
-        # Check if the player has reached the right edge of the screen
+        # Check if the player reaches the right edge
         if player.rect.right >= width:
-            # Stop background music
             pygame.mixer.music.stop()
-            shed(player,character_image_path,bg_width,True)
+            shed(player, character_image_path, bg_width, True)
 
-        # Update the display once after all drawing is done
         pygame.display.flip()
-
-
