@@ -5,6 +5,7 @@ import math
 from bullet import Bullet
 from PIL import Image
 import random
+from laser import Laser
 
 #Constants for my shaking implementation
 shake_duration = 10  # Number of frames to shake
@@ -32,6 +33,10 @@ class Player(pygame.sprite.Sprite):
         # NEW: Store background dimensions
         self.bg_width = bg_width
         self.bg_height = 551
+
+        #laser attributes
+        self.laser_mode= False #default: bullets enabled
+        self.laser_cooldown =0 #cooldown timer for lasers
 
     def take_damage(self,damage,is_invincible):
         if not is_invincible:
@@ -77,22 +82,34 @@ class Player(pygame.sprite.Sprite):
         if self.shake_counter == 0:  # Start shaking if not already shaking
             self.shake_counter = shake_duration
 
-    def shoot(self, bullets):
+    def shoot(self, bullets, lasers):
         """
-        bullets --> pygame group where I will add bullets
+        Handles shooting for bullets and lasers.
+        -spacebar fires a continuous laser
+        -bullets are fired in all directions with a cooldown
         """
-        # cooldown ==> how many frames I need to wait until I can shoot again
-        if self.bullet_cooldown <= 0:
-            # === defining the directions in which the bullets will fly ===
-            # these 4 directions are, in order, right, left, up, down
-            for angle in [0, math.pi, math.pi / 2, 3 * math.pi / 2]:
-                bullet = Bullet(self.rect.centerx, self.rect.centery, angle)
-                bullets.add(bullet)
+        keys = pygame.key.get_pressed()
 
-            # resetting the cooldown
-            self.bullet_cooldown = fps
+        # BULLET SHOOTING - Left Mouse Button
+        if pygame.mouse.get_pressed()[0]:  # Left mouse button pressed
+            if self.bullet_cooldown <= 0:
+                # Fire bullets in all directions
+                for angle in [0, math.pi, math.pi / 2, 3 * math.pi / 2]:
+                    bullet = Bullet(self.rect.centerx, self.rect.centery, angle)
+                    bullets.add(bullet)
+                self.bullet_cooldown = fps  # Reset cooldown
 
-        self.bullet_cooldown -= 1
+        # LASER SHOOTING - SPACE key
+        if keys[pygame.K_SPACE]:
+            # Ensure only one laser exists at a time
+            if not lasers:
+                laser = Laser(self.rect)
+                lasers.add(laser)
+        else:
+            # Stop the laser when SPACE key is released
+            lasers.empty()
+
+
 
 
 
