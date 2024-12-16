@@ -95,4 +95,3 @@ def shed(player, selected_character, bg_width,overlay_visible):
 
 
         pygame.display.flip()
-
