@@ -98,7 +98,7 @@ class Player(pygame.sprite.Sprite):
                 for angle in [0, math.pi, math.pi / 2, 3 * math.pi / 2]:
                     bullet = Bullet(self.rect.centerx, self.rect.centery, angle)
                     bullets.add(bullet)
-                self.bullet_cooldown = 1//5  # Reset cooldown
+                self.bullet_cooldown = fps//8  # Reset cooldown
             if self.bullet_cooldown>0:
                 self.bullet_cooldown-=1
 
