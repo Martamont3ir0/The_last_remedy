@@ -125,14 +125,16 @@ def game_loop(interface_callback):
     while True:
         if current_state == "main":
             current_state = execute_game(player, selected_character, interface_callback)
+        elif current_state == "puzzle_message":
+            current_state = puzzle_message(background, player, selected_character, bg_width)
+        elif current_state == "puzzle_game":
+            current_state = puzzle_game(screen, player, selected_character, bg_width)
         elif current_state == "shed_light":
             current_state = shed(player, selected_character, bg_width,True,False)
         elif current_state == "shed_normal":
             current_state = shed(player, selected_character, bg_width,False,False)
         elif current_state == "shed_map":
             current_state = shed(player, selected_character, bg_width, False, True)
-        elif current_state == "puzzle_message":
-            current_state = puzzle_message(background, player, selected_character, bg_width)
         elif current_state == "backpack":
             current_state = backpack(screen, player, selected_character, bg_width)
         elif current_state == "shop":

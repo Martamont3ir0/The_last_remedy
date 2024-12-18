@@ -67,7 +67,7 @@ def shed(player, selected_character, bg_width,overlay_visible, map_visible):
     # Main loop
     running = True
 
-    while running and overlay_visible:
+    while running and overlay_visible and not map_visible:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -124,6 +124,7 @@ def shed(player, selected_character, bg_width,overlay_visible, map_visible):
                 bullet= Bullet(player.rect.centerx, player.rect.centery, 0)
                 bullets.add(bullet)
                 player.bullet_cooldown=fps//5
+
         #reduce bullet cooldown timer
         if player.bullet_cooldown>0:
             player.bullet_cooldown-=1

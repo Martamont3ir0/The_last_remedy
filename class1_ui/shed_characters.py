@@ -35,10 +35,10 @@ class Monster(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
 
         # starting the monster at a precise location on the screen
-        self.rect.x = 1000 #out of bounds but this way it will take longer to get to the player
+        self.rect.x = 2000 #out of bounds but this way it will take longer to get to the player
         self.rect.y = 400
 
-        self.speed = 0.55
+        self.speed = 0.51
         self.health = 200
 
     def update(self):

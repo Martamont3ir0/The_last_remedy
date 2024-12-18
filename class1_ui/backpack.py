@@ -186,6 +186,7 @@ def backpack(screen,player,selected_character,bg_width):
                             backpack_chest.remove_item(item)
                             player.weapon = "Laser"
                             player.use_laser= True
+                            return "shed_map"
 
             elif item.name == "Health Potion":
                 item_image = pygame.transform.scale(item_image, (130, 130))
