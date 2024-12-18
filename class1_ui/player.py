@@ -29,6 +29,9 @@ class Player(pygame.sprite.Sprite):
         self.bullet_cooldown = 0
         self.is_invincible = False
 
+        self.money= 100
+        self.weapon="None"
+
 
         # NEW: Store background dimensions
         self.bg_width = bg_width
@@ -83,6 +86,7 @@ class Player(pygame.sprite.Sprite):
             self.shake_counter = shake_duration
 
     def shoot(self, bullets, lasers):
+
         """
         Handles shooting for bullets and lasers.
         -spacebar fires a continuous laser
@@ -97,7 +101,9 @@ class Player(pygame.sprite.Sprite):
                 for angle in [0, math.pi, math.pi / 2, 3 * math.pi / 2]:
                     bullet = Bullet(self.rect.centerx, self.rect.centery, angle)
                     bullets.add(bullet)
-                self.bullet_cooldown = fps  # Reset cooldown
+                self.bullet_cooldown = fps//5  # Reset cooldown
+            if self.bullet_cooldown>0:
+                self.bullet_cooldown-=1
 
         # LASER SHOOTING - SPACE key
         if keys[pygame.K_SPACE]:
@@ -108,14 +114,3 @@ class Player(pygame.sprite.Sprite):
         else:
             # Stop the laser when SPACE key is released
             lasers.empty()
-
-
-
-
-
-
-
-
-
-
-
