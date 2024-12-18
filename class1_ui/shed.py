@@ -7,6 +7,8 @@ from death import *
 from user_info import *
 from backpack import *
 from shed_characters import *
+from laser import Laser
+from bullet import Bullet
 
 def shed(player, selected_character, bg_width,overlay_visible, map_visible):
     # Basic setup
@@ -27,6 +29,9 @@ def shed(player, selected_character, bg_width,overlay_visible, map_visible):
     # setting up the player
     player_group = pygame.sprite.Group()
     player_group.add(player)
+
+    bullets= pygame.sprite.Group()
+    lasers= pygame.sprite.Group()
     # setting up the other characters
 
     coins_group = pygame.sprite.Group()
@@ -42,6 +47,10 @@ def shed(player, selected_character, bg_width,overlay_visible, map_visible):
     monster_ex = Monster()
     monster = pygame.sprite.Group()
     monster.add(monster_ex)
+
+    #ensure player has user_laser attribute
+    if not hasattr(player, 'use_laser'):
+        player.use_laser= False
 
     #information for start message
     level2_title = "Level 2: 'The Wastes'"
@@ -73,6 +82,7 @@ def shed(player, selected_character, bg_width,overlay_visible, map_visible):
         # Update the display (if needed)
         pygame.display.flip()
     pygame.mixer.music.play(-1)  # Start playing music in a loop
+
     while True:
 
         clock.tick(fps)
@@ -93,11 +103,43 @@ def shed(player, selected_character, bg_width,overlay_visible, map_visible):
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
                 if backpack_rect.collidepoint(event.pos):# Check if backpack is clicked
+                    player.user_laser= False
                     return "backpack"#Enter the backpack
 
+                # Start laser on KEYDOWN
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE and player.weapon == "Laser" and player.use_laser:
+                    if not lasers:  # Fire laser if not already active
+                        laser = Laser(player.rect)
+                        lasers.add(laser)
+
+                # Stop laser on KEYUP
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_SPACE:
+                    lasers.empty()  # Remove the laser when SPACE is released
+
+        #shooting logic
+        if pygame.mouse.get_pressed()[0]:
+            if player.bullet_cooldown<=0:
+                bullet= Bullet(player.rect.centerx, player.rect.centery, 0)
+                bullets.add(bullet)
+                player.bullet_cooldown=fps//5
+        #reduce bullet cooldown timer
+        if player.bullet_cooldown>0:
+            player.bullet_cooldown-=1
+
+        #update and draw all sprites
+        player_group.update()
+        bullets.update()
+        lasers.update(player)
+
+
+
         player_group.draw(screen)  # Draw the player on the screen
+        bullets.draw(screen)
+        lasers.draw(screen)
         # Update the player's position
-        player.update()
+        #           player.update()
         #Show backpack on a specific position
         screen.blit(backpack_img,backpack_rect.topleft)# Blit the image at the top-left of the rect
 

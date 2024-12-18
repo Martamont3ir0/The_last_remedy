@@ -185,6 +185,7 @@ def backpack(screen,player,selected_character,bg_width):
                         if item_rect.collidepoint(event.pos):  # Check if laser is clicked
                             backpack_chest.remove_item(item)
                             player.weapon = "Laser"
+                            player.use_laser= True
 
             elif item.name == "Health Potion":
                 item_image = pygame.transform.scale(item_image, (130, 130))

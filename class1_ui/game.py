@@ -176,7 +176,7 @@ def execute_game(player: Player = None, character_image_path=None, interface_cal
 
 
     # Max countdown time for survival
-    countdown_time = 60
+    countdown_time = 10
     start_time = time.time()
 
     running = True
@@ -235,7 +235,7 @@ def execute_game(player: Player = None, character_image_path=None, interface_cal
 
         # Render countdown timer
         font = pygame.font.Font(None, 46)
-        timer_text = font.render(f"{remaining_time // 60}:{remaining_time % 60:02d}", True, deep_black)
+        timer_text = font.render(f"{remaining_time // 10}:{remaining_time % 10:02d}", True, deep_black)
         screen.blit(timer_text, (width // 2 - timer_text.get_width() // 2, 10))
 
         # Player shooting (bullets and lasers)
