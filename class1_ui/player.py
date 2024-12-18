@@ -28,8 +28,9 @@ class Player(pygame.sprite.Sprite):
         self.health = 100
         self.bullet_cooldown = 0
         self.is_invincible = False
-
-
+        self.money = 200
+        self.weapon = "Default Bullets"
+        self.pup = None
         # NEW: Store background dimensions
         self.bg_width = bg_width
         self.bg_height = 551

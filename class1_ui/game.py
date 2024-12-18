@@ -8,6 +8,7 @@ import time
 from puzzle_message import *
 from death import death
 from user_info import *
+from surprise_pup import Surprise
 
 def character_selection_screen():
     # Screen setup
@@ -109,7 +110,7 @@ def game_loop(interface_callback):
                 running = False
                 pygame.quit()
 
-        if pygame.time.get_ticks() - start_time >= 10000: #After 10 seconds, the loop of start message ends
+        if pygame.time.get_ticks() - start_time >= 1000: #After 10 seconds, the loop of start message ends
             running = False
 
 
@@ -124,8 +125,21 @@ def game_loop(interface_callback):
     while True:
         if current_state == "main":
             current_state = execute_game(player, selected_character, interface_callback)
-        elif current_state == "shed":
-            current_state = shed(player, selected_character, bg_width,True)
+        elif current_state == "shed_light":
+            current_state = shed(player, selected_character, bg_width,True,False)
+        elif current_state == "shed_normal":
+            current_state = shed(player, selected_character, bg_width,False,False)
+        elif current_state == "shed_map":
+            current_state = shed(player, selected_character, bg_width, False, True)
+        elif current_state == "puzzle_message":
+            current_state = puzzle_message(background, player, selected_character, bg_width)
+        elif current_state == "backpack":
+            current_state = backpack(screen, player, selected_character, bg_width)
+        elif current_state == "shop":
+            current_state = shop_window(screen, player, selected_character, bg_width)
+        elif current_state == "death":
+            current_state = death(interface_callback)
+
 
 def execute_game(player: Player = None, character_image_path=None, interface_callback=None):
     # SETUP:
@@ -151,11 +165,18 @@ def execute_game(player: Player = None, character_image_path=None, interface_cal
     lasers = pygame.sprite.Group()  # Group for lasers
     enemies = pygame.sprite.Group()
 
+    surprise_count = 0
     enemy_cooldown = 0
     bg_x = 0
 
+    #creating our level 1 powerup variables so that they can be examined later
+    speed_boost = False
+    shield = False
+    surprise = pygame.sprite.Group()
+
+
     # Max countdown time for survival
-    countdown_time = 10
+    countdown_time = 60
     start_time = time.time()
 
     running = True
@@ -168,20 +189,42 @@ def execute_game(player: Player = None, character_image_path=None, interface_cal
                 pygame.quit()
                 exit()
 
+
         # Calculate remaining time
         elapsed_time = time.time() - start_time
         remaining_time = max(0, countdown_time - int(elapsed_time))
 
+        #at a certain time, the surprise balloon must appear
+        if remaining_time == 45 and surprise_count == 0:
+            surprise_ex = Surprise()  # Create a new surprise balloon
+            surprise.add(surprise_ex)  # Add it to the group
+            speed_boost = True  # Set to true so that the powerup is speed boost
+            surprise_count += 1
+            print("incoming surprise....")
+
+
+
+        if remaining_time == 25 and surprise_count == 1:
+            surprise_ex = Surprise()  # Create a new surprise balloon
+            surprise.add(surprise_ex)  # Add it to the group
+            shield = True  # Set to true so that the powerup is invincibility
+            surprise_count += 1
+            print("incoming surprise....")
+
+        # Clear the screen
+        screen.fill((0, 0, 0))
+
+
         # Check if the timer runs out
         if remaining_time == 0:
             pygame.mixer.music.stop()
-            puzzle_message(background, player, character_image_path, bg_width)
+            return "puzzle_message"
 
         # Clear the screen
         screen.fill((0, 0, 0))
 
         # Move background for parallax effect
-        bg_x -= player.speed
+        bg_x -= 5 #equal to player's speed in a normal situation
         if bg_x <= -bg_width:
             bg_x = 0
         screen.blit(background, (bg_x, 0))
@@ -192,7 +235,7 @@ def execute_game(player: Player = None, character_image_path=None, interface_cal
 
         # Render countdown timer
         font = pygame.font.Font(None, 46)
-        timer_text = font.render(f"{remaining_time // 10}:{remaining_time % 10:02d}", True, deep_black)
+        timer_text = font.render(f"{remaining_time // 60}:{remaining_time % 60:02d}", True, deep_black)
         screen.blit(timer_text, (width // 2 - timer_text.get_width() // 2, 10))
 
         # Player shooting (bullets and lasers)
@@ -212,11 +255,16 @@ def execute_game(player: Player = None, character_image_path=None, interface_cal
         lasers.update(player)
         enemies.update(player)
 
+
         # Draw everything
         player_group.draw(screen)
         enemies.draw(screen)
         bullets.draw(screen)
         lasers.draw(screen)
+
+        # Draw the surprise balloon if the flag is set
+        surprise.update()  # Update the surprise balloon
+        surprise.draw(screen)  # Draw the surprise balloon
 
         # Bullet collisions
         for bullet in bullets:
@@ -238,18 +286,37 @@ def execute_game(player: Player = None, character_image_path=None, interface_cal
         # Handle player collisions with enemies
         collided_enemies = pygame.sprite.spritecollide(player, enemies, False)
         if collided_enemies:
-            player.take_damage(20, False)
+            player.take_damage(10, player.is_invincible)
             for drone in collided_enemies:
                 drone.kill()
 
+        # Initialize powerup to None
+        powerup = None
+
+        # Check whether the surprise offers invincibility or speed boost
+        if shield and pygame.sprite.spritecollide(player, surprise, True):
+            powerup = Invincibility(15)  # Create a variable with the powerup
+            shield = False
+
+
+        if speed_boost and pygame.sprite.spritecollide(player, surprise, True):
+            powerup = SpeedBoost(20)  # Create a variable with the powerup
+            speed_boost = False
+
+        # Handle applying the powerup
+        if powerup is not None:
+            powerup.apply(player)
+
+
         # Check player health
         if player.health <= 0:
-            death(interface_callback)
             player.health = 100
+            return "death"
+
 
         # Check if the player reaches the right edge
         if player.rect.right >= width:
             pygame.mixer.music.stop()
-            shed(player, character_image_path, bg_width, True)
+            return "shed_light"
 
         pygame.display.flip()
