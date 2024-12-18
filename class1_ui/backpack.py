@@ -59,7 +59,7 @@ def shop_window(screen,player,selected_character,bg_width):
         {"name": "Health Potion", "value": 25, "image_path": "img/health_potion.png"},
         {"name": "Shield", "value": 40, "image_path": ""},
         {"name": "Example 1", "value": 205, "image_path": ""},
-        {"name": "Example 2", "value": 400, "image_path": ""}
+        {"name": "Grenade", "value": 10, "image_path": "img/grenade.png"}
     ]
     background = pygame.image.load("img/shop.png")
     running = True
@@ -124,6 +124,9 @@ def shop_window(screen,player,selected_character,bg_width):
                         backpack(screen,player,selected_character,bg_width)
 
 backpack_chest = Chest() #Create my chest as the backpack of Luca Quinn, where the player can store its things
+map_wastes = Item("Map",0,"img/map.png")
+backpack_chest.add_item(map_wastes)  # Add the map item to the chest
+
 def backpack(screen,player,selected_character,bg_width):
 
     background = pygame.image.load("img/backpackchest.png")
@@ -142,9 +145,9 @@ def backpack(screen,player,selected_character,bg_width):
                 if add_symbol_rect.collidepoint(event.pos):  # Check if add symbol is clicked to enter the shop
                     new_item = shop_window(screen,player,selected_character, bg_width)
                     backpack_chest.add_item(new_item)
-                    backpack(screen,player,selected_character,bg_width)
+                    return "backpack"
                 elif return_symbol_rect.collidepoint(event.pos):  # Check if return symbol is clicked to return
-                    shed(player,selected_character,bg_width,False)
+                    return "shed_normal"
 
         screen.blit(background, (0, 0))
         screen.blit(add_symbol, add_symbol_rect)
@@ -161,20 +164,31 @@ def backpack(screen,player,selected_character,bg_width):
                     if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
                         if item_rect.collidepoint(event.pos):# Check if glasses are clicked
                             backpack_chest.remove_item(item)
-                            shed(player,selected_character,bg_width,False) #return to the desert and without the overlay, aka sunlight
+                            return "shed_normal" #return to the desert and without the overlay, aka sunlight
+
+            elif item.name == "Map":
+                item_image = pygame.transform.scale(item_image, (190, 150))
+                item_rect = item_image.get_rect(topleft=(30, 420))  # Create a rect for the image
+                # Check for mouse button down event
+                for event in pygame.event.get():
+                    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
+                        if item_rect.collidepoint(event.pos):  # Check if map is clicked
+                            backpack_chest.remove_item(item)
+                            return "shed_map"
 
             elif item.name == "Laser":
-                item_image = pygame.transform.scale(item_image, (160, 110))
-                item_rect = item_image.get_rect(topleft=(270, 228))  # Create a rect for the image
+                item_image = pygame.transform.scale(item_image, (180, 140))
+                item_rect = item_image.get_rect(topleft=(280, 200))  # Create a rect for the image
                 # Check for mouse button down event
                 for event in pygame.event.get():
                     if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
                         if item_rect.collidepoint(event.pos):  # Check if laser is clicked
                             backpack_chest.remove_item(item)
                             player.weapon = "Laser"
+
             elif item.name == "Health Potion":
                 item_image = pygame.transform.scale(item_image, (130, 130))
-                item_rect = item_image.get_rect(topleft=(500, 210))  # Create a rect for the image
+                item_rect = item_image.get_rect(topleft=(550, 210))  # Create a rect for the image
                 health_potion = HealthRegeneration(0,100-player.health) #Create a variable with the health regeneration powerup,where the amount is what is left for the player to be fully healthy
                 # Check for mouse button down event
                 for event in pygame.event.get():
@@ -182,7 +196,18 @@ def backpack(screen,player,selected_character,bg_width):
                         if item_rect.collidepoint(event.pos):  # Check if potion is clicked
                             backpack_chest.remove_item(item)
                             health_potion.apply(player) #apply the power up to the player
-                            shed(player, selected_character, bg_width, False)
+                            return "shed_map"
+
+            elif item.name == "Grenade":
+                item_image = pygame.transform.scale(item_image, (110, 170))
+                item_rect = item_image.get_rect(topleft=(580, 370))  # Create a rect for the image
+                # Check for mouse button down event
+                for event in pygame.event.get():
+                    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
+                        if item_rect.collidepoint(event.pos):  # Check if laser is clicked
+                            backpack_chest.remove_item(item)
+                            #player.weapon = "Grenade
+
 
             screen.blit(item_image, item_rect.topleft)  # Blit the image at the top-left of the rect
 

@@ -2,7 +2,7 @@ from config import *
 import pygame
 import random
 import math
-from PIL import Image
+
 
 class Enemy(pygame.sprite.Sprite):
 

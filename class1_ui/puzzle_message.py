@@ -138,7 +138,7 @@ def puzzle_game(screen,player,selected_character,bg_width):
 
         if solved:
             print("Puzzle Solved!")
-            shed(player, selected_character, bg_width,True) #proceed to the shed after solving the puzzle
+            return "shed_light" #proceed to the shed after solving the puzzle
 
 
         # Display the timer

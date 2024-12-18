@@ -36,22 +36,25 @@ class SpeedBoost(PowerUp):
         self._duration = duration
         self._is_active = False
         self._start_time = None
-
     def apply(self, player):
         player.speed += 10  # Increasing the speed by 10
         self._is_active = True
         self._start_time = time.time()  # Record the time when the power-up is applied
+        self.is_active(player)
 
     def remove(self, player):
-        player.speed -= 10  # Revert effect
+        player.speed -= 4  # Revert effect
         self._is_active = False
 
     def duration(self):
         return self._duration
 
     def is_active(self,player):
-        if self._is_active and (time.time() - self._start_time >= self._duration):
-            self.remove(player)  # Automatically remove if duration has passed
+        if self._is_active:
+            player.pup = "SpeedBoost"
+            if time.time() - self._start_time >= self._duration:
+                self.remove(player)  # Automatically remove if duration has passed
+
         return self._is_active
 
 
@@ -65,6 +68,8 @@ class Invincibility(PowerUp):
         player.is_invincible = True
         self._is_active = True
         self._start_time = time.time()  # Record the time when the power-up is applied
+        self.is_active(player)
+
 
     def remove(self, player):
         player.is_invincible = False
@@ -74,8 +79,11 @@ class Invincibility(PowerUp):
         return self._duration
 
     def is_active(self,player):
-        if self._is_active and (time.time() - self._start_time >= self._duration):
-            self.remove(player)  # Automatically remove if duration has passed
+        if self._is_active:
+            player.pup = "Invincibility"
+            if time.time() - self._start_time >= self._duration:
+                self.remove(player)  # Automatically remove if duration has passed
+
         return self._is_active
 
 
@@ -89,6 +97,7 @@ class HealthRegeneration(PowerUp):
         self._is_active = True
         player.health += self._regeneration_amount  # Apply the regeneration immediately
         player.health = min(player.health, 100)  # Cap health at max (e.g., 100)
+        self.is_active(player)
 
     def remove(self, player):
         self._is_active = False
@@ -97,5 +106,6 @@ class HealthRegeneration(PowerUp):
         return self._duration
 
     def is_active(self,player):
+        player.pup = "Health Regeneration"
         return self._is_active
 

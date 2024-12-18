@@ -39,3 +39,8 @@ def user_info(player,screen,during_message):
         weapon_rect = weapon_text.get_rect()
         weapon_rect.center = (545, 620)
         screen.blit(weapon_text, weapon_rect)
+        pup_text = f"Current PowerUp: {player.pup}"
+        pup_text = font2.render(pup_text, True, deep_black)
+        pup_rect = pup_text.get_rect()
+        pup_rect.center = (515, 675)
+        screen.blit(pup_text, pup_rect)
