@@ -1,5 +1,36 @@
   # Config file for global constants and settings
 
+import json
+import pygame
+
+
+def save_settings(filename="settings.json"):
+    with open(filename, "w") as file:
+        json.dump(game_settings, file)
+
+def load_settings(filename="settings.json"):
+    global game_settings
+    try:
+        with open(filename, "r") as file:
+            game_settings.update(json.load(file))
+    except FileNotFoundError:
+        pass  # Use default settings if no file is found
+
+def apply_brightness_and_sound(screen):
+    """
+    Apply the current brightness and sound settings globally.
+    """
+    # Apply brightness overlay
+    brightness_value = game_settings.get("brightness", 1.0)  # Default to full brightness if not set
+    brightness_overlay = pygame.Surface(resolution, pygame.SRCALPHA)
+    brightness_alpha = int((1 - brightness_value) * 255)  # Calculate alpha value
+    brightness_overlay.fill((0, 0, 0, brightness_alpha))  # Apply brightness dimming
+    screen.blit(brightness_overlay, (0, 0))
+
+    # Apply sound volume
+    pygame.mixer.music.set_volume(game_settings.get("sound_volume", 0.5))  # Default to 50% if not set
+
+
 # COLORS
 dark_red = (138, 0, 0)          # Dark red for buttons
 deep_black = (19, 20, 20)       # Almost black for background
@@ -75,3 +106,8 @@ puzzle_node_positions=[
     (600, 200), (600, 280), (600, 360),
     (600, 440), (600, 520), (600, 600), (600, 680)
 ]
+
+game_settings={
+    "brightness": 1.0, #default brightness
+    "sound_volume": 0.5 #default sound volume
+}

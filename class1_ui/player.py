@@ -45,9 +45,6 @@ class Player(pygame.sprite.Sprite):
         else:
             return self.health
 
-
-
-
     def update(self):
         """
 
@@ -83,7 +80,7 @@ class Player(pygame.sprite.Sprite):
         if self.shake_counter == 0:  # Start shaking if not already shaking
             self.shake_counter = shake_duration
 
-    def shoot(self, bullets, lasers):
+    def shoot(self, bullets,lasers):
         """
         Handles shooting for bullets and lasers.
         -spacebar fires a continuous laser
@@ -99,11 +96,9 @@ class Player(pygame.sprite.Sprite):
                     bullet = Bullet(self.rect.centerx, self.rect.centery, angle)
                     bullets.add(bullet)
                 self.bullet_cooldown = fps//8  # Reset cooldown
-            if self.bullet_cooldown>0:
-                self.bullet_cooldown-=1
 
         # LASER SHOOTING - SPACE key
-        if keys[pygame.K_SPACE]:
+        if keys[pygame.K_SPACE] and self.weapon=="Laser" and self.use_laser:
             # Ensure only one laser exists at a time
             if not lasers:
                 laser = Laser(self.rect)
@@ -111,9 +106,5 @@ class Player(pygame.sprite.Sprite):
         else:
             # Stop the laser when SPACE key is released
             lasers.empty()
-
-
-
-
-
-
+        if self.bullet_cooldown>0:
+            self.bullet_cooldown-=1

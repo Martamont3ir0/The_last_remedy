@@ -27,6 +27,21 @@ def puzzle_game(screen,player,selected_character,bg_width):
         Returns:
             function shed if the puzzle is solved, or triggers a retry/reset if the timer runs out.
     """
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+
+        # Render game elements
+        screen.fill(deep_black)
+        # Add your puzzle game logic here
+
+        # Apply brightness and sound
+        apply_brightness_and_sound(screen)
+
+        pygame.display.flip()
 
     def show_retry_prompt(screen):
         """

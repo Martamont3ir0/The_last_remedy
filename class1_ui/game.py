@@ -113,6 +113,16 @@ def game_loop(interface_callback):
         if pygame.time.get_ticks() - start_time >= 1000: #After 10 seconds, the loop of start message ends
             running = False
 
+        # Render elements
+        screen.fill(deep_black)
+        screen.blit(background, (0, 0))
+
+        # Apply brightness and sound dynamically
+        apply_brightness_and_sound(screen)
+
+        # Update display
+        pygame.display.flip()
+
 
 
         # Update the display (if needed)
@@ -141,6 +151,11 @@ def game_loop(interface_callback):
             current_state = shop_window(screen, player, selected_character, bg_width)
         elif current_state == "death":
             current_state = death(interface_callback)
+
+        #applying brightness and sound settings in each loop iteration
+        apply_brightness_and_sound(screen)
+
+        pygame.display.flip()
 
 
 def execute_game(player: Player = None, character_image_path=None, interface_callback=None):
@@ -178,7 +193,7 @@ def execute_game(player: Player = None, character_image_path=None, interface_cal
 
 
     # Max countdown time for survival
-    countdown_time = 10
+    countdown_time = 60
     start_time = time.time()
 
     running = True
@@ -223,7 +238,9 @@ def execute_game(player: Player = None, character_image_path=None, interface_cal
             return "puzzle_message"
 
         # Clear the screen
-        screen.fill((0, 0, 0))
+        screen.fill(deep_black)
+        screen.blit(background, (0, 0))
+
 
         # Move background for parallax effect
         bg_x -= 5 #equal to player's speed in a normal situation
@@ -237,12 +254,12 @@ def execute_game(player: Player = None, character_image_path=None, interface_cal
 
         # Render countdown timer
         font = pygame.font.Font(None, 46)
-        timer_text = font.render(f"{remaining_time // 10}:{remaining_time % 10:02d}", True, deep_black)
+        timer_text = font.render(f"{remaining_time // 60}:{remaining_time % 60:02d}", True, deep_black)
         screen.blit(timer_text, (width // 2 - timer_text.get_width() // 2, 10))
 
         # Player shooting (bullets and lasers)
         keys = pygame.key.get_pressed()
-        player.shoot(bullets, lasers)  # Pass keys to handle laser shooting
+        player.shoot(bullets,lasers)  # Pass keys to handle laser shooting
 
         # Spawn enemies
         if enemy_cooldown <= 0:
@@ -254,7 +271,7 @@ def execute_game(player: Player = None, character_image_path=None, interface_cal
         # Update all groups
         player_group.update()
         bullets.update()
-        lasers.update(player)
+
         enemies.update(player)
 
 
@@ -262,11 +279,14 @@ def execute_game(player: Player = None, character_image_path=None, interface_cal
         player_group.draw(screen)
         enemies.draw(screen)
         bullets.draw(screen)
-        lasers.draw(screen)
+
 
         # Draw the surprise balloon if the flag is set
         surprise.update()  # Update the surprise balloon
         surprise.draw(screen)  # Draw the surprise balloon
+
+        # Apply brightness and sound settings dynamically
+        apply_brightness_and_sound(screen)
 
         # Bullet collisions
         for bullet in bullets:
@@ -277,13 +297,6 @@ def execute_game(player: Player = None, character_image_path=None, interface_cal
                 if enemy.health <= 0:
                     enemy.kill()
 
-        # Laser collisions
-        for laser in lasers:
-            collided_enemies = pygame.sprite.spritecollide(laser, enemies, False)
-            for enemy in collided_enemies:
-                enemy.health -= 30  # Lasers deal more damage
-                if enemy.health <= 0:
-                    enemy.kill()
 
         # Handle player collisions with enemies
         collided_enemies = pygame.sprite.spritecollide(player, enemies, False)
@@ -300,7 +313,6 @@ def execute_game(player: Player = None, character_image_path=None, interface_cal
             powerup = Invincibility(15)  # Create a variable with the powerup
             shield = False
 
-
         if speed_boost and pygame.sprite.spritecollide(player, surprise, True):
             powerup = SpeedBoost(20)  # Create a variable with the powerup
             speed_boost = False
@@ -309,12 +321,10 @@ def execute_game(player: Player = None, character_image_path=None, interface_cal
         if powerup is not None:
             powerup.apply(player)
 
-
         # Check player health
         if player.health <= 0:
             player.health = 100
             return "death"
-
 
         # Check if the player reaches the right edge
         if player.rect.right >= width:

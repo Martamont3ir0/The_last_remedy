@@ -67,11 +67,13 @@ def shed(player, selected_character, bg_width,overlay_visible, map_visible):
     # Main loop
     running = True
 
-    while running and overlay_visible and not map_visible:
+    while running and overlay_visible:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
+
+
         # Show level start message
 
         show_start_message(screen, level2_title, level2_description, background,player)
@@ -106,7 +108,7 @@ def shed(player, selected_character, bg_width,overlay_visible, map_visible):
                     player.user_laser= False
                     return "backpack"#Enter the backpack
 
-                # Start laser on KEYDOWN
+                # Start laser on KEYDOWN (only on level 2)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE and player.weapon == "Laser" and player.use_laser:
                     if not lasers:  # Fire laser if not already active
@@ -118,30 +120,17 @@ def shed(player, selected_character, bg_width,overlay_visible, map_visible):
                 if event.key == pygame.K_SPACE:
                     lasers.empty()  # Remove the laser when SPACE is released
 
-        #shooting logic
-        if pygame.mouse.get_pressed()[0]:
-            if player.bullet_cooldown<=0:
-                bullet= Bullet(player.rect.centerx, player.rect.centery, 0)
-                bullets.add(bullet)
-                player.bullet_cooldown=fps//5
-
-        #reduce bullet cooldown timer
-        if player.bullet_cooldown>0:
-            player.bullet_cooldown-=1
 
         #update and draw all sprites
         player_group.update()
-        bullets.update()
+
         lasers.update(player)
 
 
-
         player_group.draw(screen)  # Draw the player on the screen
-        bullets.draw(screen)
+        #bullets.draw(screen)
         lasers.draw(screen)
-        # Update the player's position
-        #           player.update()
-        #Show backpack on a specific position
+
         screen.blit(backpack_img,backpack_rect.topleft)# Blit the image at the top-left of the rect
 
         if overlay_visible:
@@ -210,14 +199,9 @@ def shed(player, selected_character, bg_width,overlay_visible, map_visible):
             if collided_monster:
                 return "death"
 
-            # Laser collisions
-            #for laser in lasers:
-                #collided_enemies = pygame.sprite.spritecollide(laser, monster, False)
-                #monster_ex.health -= 30  # Lasers deal more damage
-                #if monster_ex.health <= 0:
-                    #monster_ex.kill()
 
-
+        # Apply brightness and sound settings dynamically
+        apply_brightness_and_sound(screen)
 
         pygame.display.flip()
 

@@ -7,12 +7,8 @@ from utils import (
     glowing_title,
     under_construction
 )
-from config import*
+from config import *
 from game import *
-
-
-
-
 
 def interface():
     """
@@ -71,7 +67,6 @@ contains the main user interface logic:
                     return
                 elif options_hover.collidepoint(mouse):
                     setting_menus(screen)
-                    return
             elif ev.type == pygame.MOUSEBUTTONUP:
                 # Handle button clicks
                 if start_hover.collidepoint(mouse):
@@ -89,9 +84,6 @@ contains the main user interface logic:
                 elif  options_hover.collidepoint(mouse):
                     under_construction(screen)
                     return
-
-
-
 
         # Draw background and overlay
         screen.fill(deep_black)
@@ -147,11 +139,10 @@ contains the main user interface logic:
             hover_color=(50, 255, 50), mouse_pos=mouse
         )
 
-
+        apply_brightness_and_sound(screen)
         # Update display
         pygame.display.update()
         pygame.time.delay(30)
-
 
 def rules(screen, main_background, overlay, title_font):
     """
@@ -265,10 +256,11 @@ def credits_(screen):
     credits_font = pygame.font.SysFont("bookantiqua", 30)
     header_font = pygame.font.SysFont("bookantiqua", 50, bold=True)
     header_text = "'The Last Remedy' credits..."
-    credits_text = [
+    credits_text = [ "Professors:",
         "Augusto Santos, ajrsantos@novaims.unl.pt",
         "Diogo Rastreio, drasteiro@novaims.unl.pt",
         "Liah Rosenfeld, lrosenfeld@novaims.unl.pt",
+        "Coders :",
         "Marta Monteiro, 20231666@novaims.unl.pt",
         "Marta Trindade, 20231626@novaims.unl.pt",
         "Martim  Pereira, 20231663@novaims.unl.pt"
@@ -293,7 +285,6 @@ def credits_(screen):
                     interface()
                     return
                 clicked_button=None
-
 
         screen.fill(deep_black)
         screen.blit(credits_bg, (0, 0))
@@ -349,17 +340,14 @@ def setting_menus(screen):
     title_font= pygame.font.SysFont("bookantiqua", 50)
     label_font= pygame.font.SysFont("bookantiqua", 30)
 
-    #variables for settings
-    music_volume= 0.5 #default music volume
-    brightness= 1.0 #default brightness
 
     # Slider positions
     volume_slider_rect = pygame.Rect(200, 200, 400, 10)
     brightness_slider_rect = pygame.Rect(200, 300, 400, 10)
 
     # Knob positions
-    volume_knob_x = volume_slider_rect.left + music_volume * volume_slider_rect.width
-    brightness_knob_x = brightness_slider_rect.left + brightness * brightness_slider_rect.width
+    volume_knob_x = volume_slider_rect.left + game_settings["sound_volume"] * volume_slider_rect.width
+    brightness_knob_x = brightness_slider_rect.left + game_settings["brightness"] * brightness_slider_rect.width
 
     dragging_volume = False
     dragging_brightness = False
@@ -387,34 +375,22 @@ def setting_menus(screen):
 
                 # Check if the user clicked the "Back" button
                 if back_button.collidepoint(mouse):
-                    interface()
+                    save_settings()
+                    return
 
             if event.type == pygame.MOUSEBUTTONUP:
                 dragging_volume = False
                 dragging_brightness = False
 
-        # Adjust knob positions if dragging
-        if dragging_volume:
-            volume_knob_x = max(volume_slider_rect.left, min(mouse[0], volume_slider_rect.right))
-            music_volume = (volume_knob_x - volume_slider_rect.left) / volume_slider_rect.width
-            pygame.mixer.music.set_volume(music_volume)  # Adjust music volume dynamically
-
-        if dragging_brightness:
-            brightness_knob_x = max(brightness_slider_rect.left, min(mouse[0], brightness_slider_rect.right))
-            brightness = (brightness_knob_x - brightness_slider_rect.left) / brightness_slider_rect.width
-
-
 
         # Adjust knob positions if dragging
         if dragging_volume:
             volume_knob_x = max(volume_slider_rect.left, min(mouse[0], volume_slider_rect.right))
-            music_volume = (volume_knob_x - volume_slider_rect.left) / volume_slider_rect.width
-            pygame.mixer.music.set_volume(music_volume)  # Adjust music volume dynamically
-
+            game_settings["sound_volume"]= (volume_knob_x-volume_slider_rect.left)/ volume_slider_rect.width
+            pygame.mixer.music.set_volume(game_settings["sound_volume"])
         if dragging_brightness:
             brightness_knob_x = max(brightness_slider_rect.left, min(mouse[0], brightness_slider_rect.right))
-            brightness = (brightness_knob_x - brightness_slider_rect.left) / brightness_slider_rect.width
-
+            game_settings["brightness"]= (brightness_knob_x-brightness_slider_rect.left)/ brightness_slider_rect.width
 
         #update screen
         screen.fill(deep_black)
@@ -423,23 +399,22 @@ def setting_menus(screen):
         title_surface = title_font.render("Settings", True, white)
         screen.blit(title_surface, title_surface.get_rect(center=(width // 2, 100)))
 
-
         # Draw volume slider
         pygame.draw.rect(screen, (100, 100, 100), volume_slider_rect)  # Slider track
         pygame.draw.circle(screen, (200, 200, 200), (int(volume_knob_x), volume_slider_rect.centery), 10)  # Knob
-        volume_text = label_font.render(f"Music Volume: {int(music_volume * 100)}%", True, white)
+        volume_text = label_font.render(f"Music Volume: {int(game_settings['sound_volume'] * 100)}%", True, white)
         screen.blit(volume_text, (volume_slider_rect.left, volume_slider_rect.top - 30))
 
         # Draw brightness slider
         pygame.draw.rect(screen, (100, 100, 100), brightness_slider_rect)  # Slider track
         pygame.draw.circle(screen, (200, 200, 200), (int(brightness_knob_x), brightness_slider_rect.centery),
                            10)  # Knob
-        brightness_text = label_font.render(f"Brightness: {int(brightness * 100)}%", True, white)
+        brightness_text = label_font.render(f"Brightness: {int(game_settings['brightness'] * 100)}%", True, white)
         screen.blit(brightness_text, (brightness_slider_rect.left, brightness_slider_rect.top - 30))
 
         # Adjust brightness using overlay
         brightness_overlay = pygame.Surface(resolution, pygame.SRCALPHA)
-        brightness_overlay.fill((0, 0, 0, int((1 - brightness) * 255)))  # Dim the screen
+        brightness_overlay.fill((0, 0, 0, int((1 - game_settings['brightness']) * 255)))  # Dim the screen
         screen.blit(brightness_overlay, (0, 0))
 
         # Draw "Back" button
