@@ -1,4 +1,4 @@
-# if i want to test my code, run this file
+# if I want to test my code, run this file
 from interface import interface
 
 def main():

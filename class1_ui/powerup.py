@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
 import time
+import pygame
+
+
 
 class PowerUp(ABC):
     @abstractmethod
@@ -16,79 +19,56 @@ class PowerUp(ABC):
         """
         pass
 
-    @abstractmethod
-    def duration(self):
-        """
-        Return the duration of the power-up effect.
-        """
-        pass
 
-    @abstractmethod
-    def is_active(self,player):
-        """
-        Check if the power-up is currently active.
-        """
-        pass
+
+
 
 
 class SpeedBoost(PowerUp):
+
     def __init__(self, duration):
+        super().__init__()
         self._duration = duration
         self._is_active = False
-        self._start_time = None
+
     def apply(self, player):
-        player.speed += 10  # Increasing the speed by 10
-        self._is_active = True
-        self._start_time = time.time()  # Record the time when the power-up is applied
-        self.is_active(player)
+
+        player.speed += 8  # Increase the speed by 8
+        player.pup = "SpeedBoost"  # Set the player's current power-up
+
+        print(f"SpeedBoost applied.")
 
     def remove(self, player):
-        player.speed -= 4  # Revert effect
+
+        player.speed -= 8  # Revert effect
+        player.pup = None  # Clear the power-up from the player
         self._is_active = False
-
-    def duration(self):
-        return self._duration
-
-    def is_active(self,player):
-        if self._is_active:
-            player.pup = "SpeedBoost"
-            if time.time() - self._start_time >= self._duration:
-                self.remove(player)  # Automatically remove if duration has passed
-
-        return self._is_active
+        print("SpeedBoost removed.")
 
 
 class Invincibility(PowerUp):
     def __init__(self, duration):
+        super().__init__()
         self._duration = duration
         self._is_active = False
-        self._start_time = None
+
 
     def apply(self, player):
         player.is_invincible = True
         self._is_active = True
-        self._start_time = time.time()  # Record the time when the power-up is applied
-        self.is_active(player)
-
+        player.pup = "Invincibility"
+        print("Shield applied.")
 
     def remove(self, player):
         player.is_invincible = False
+        player.pup = None
         self._is_active = False
 
-    def duration(self):
-        return self._duration
-
-    def is_active(self,player):
-        if self._is_active:
-            player.pup = "Invincibility"
-            if time.time() - self._start_time >= self._duration:
-                self.remove(player)  # Automatically remove if duration has passed
-
-        return self._is_active
-
+        print("Shield removed.")
 
 class HealthRegeneration(PowerUp):
     def __init__(self, duration, regeneration_amount):
+        super().__init__()
         self._regeneration_amount = regeneration_amount
         self._duration = duration
         self._is_active = False
@@ -97,15 +77,9 @@ class HealthRegeneration(PowerUp):
         self._is_active = True
         player.health += self._regeneration_amount  # Apply the regeneration immediately
         player.health = min(player.health, 100)  # Cap health at max (e.g., 100)
-        self.is_active(player)
-
+        player.pup = "Health Regeneration"
+        print("Health applied.")
     def remove(self, player):
         self._is_active = False
-
-    def duration(self):
-        return self._duration
-
-    def is_active(self,player):
-        player.pup = "Health Regeneration"
-        return self._is_active
+        player.pup = None
 

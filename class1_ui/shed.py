@@ -9,8 +9,9 @@ from backpack import *
 from shed_characters import *
 from laser import Laser
 from bullet import Bullet
+from grenade import Grenade
 
-def shed(player, selected_character, bg_width,overlay_visible, map_visible):
+def shed(player):
     # Basic setup
     # setting up the background:
     background = pygame.image.load("img/thewastesbg.jpeg")
@@ -20,18 +21,24 @@ def shed(player, selected_character, bg_width,overlay_visible, map_visible):
 
     # Initialize player if not already done
     if player is None:
-        player = Player(bg_width, selected_character)
-
+        player = Player()
+    player.level = 2
     player.rect.left = 0
     backpack_img = pygame.image.load("img/backpack.png")
     backpack_img = pygame.transform.scale(backpack_img, (100, 100))
     backpack_rect = backpack_img.get_rect(topleft=(600, 20))  # Create a rect for the backpack image
-    # setting up the player
+    solanum = pygame.image.load("img/solanum.png")
+    solanum = pygame.transform.scale(solanum,(100,180))
+
+    # setting up active characters
+    all_sprites = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
     player_group.add(player)
-
-    bullets= pygame.sprite.Group()
     lasers= pygame.sprite.Group()
+    monster_ex = Monster()
+    monster = pygame.sprite.Group()
+    monster.add(monster_ex)
+    grenade = pygame.sprite.Group()
     # setting up the other characters
 
     coins_group = pygame.sprite.Group()
@@ -44,9 +51,6 @@ def shed(player, selected_character, bg_width,overlay_visible, map_visible):
         cactus = Cactus()
         cactus_group.add(cactus)
 
-    monster_ex = Monster()
-    monster = pygame.sprite.Group()
-    monster.add(monster_ex)
 
     #ensure player has user_laser attribute
     if not hasattr(player, 'use_laser'):
@@ -54,7 +58,13 @@ def shed(player, selected_character, bg_width,overlay_visible, map_visible):
 
     #information for start message
     level2_title = "Level 2: 'The Wastes'"
-    level2_description = ['Description for level 2','under construction....']
+    level2_description = [
+    "Objective: Reach the Solanum plant and harvest it.",
+    "Key Challenge: Navigate the desert using the map,",
+    " avoiding or defeating whatever may hurt you.",
+    "You have also gained access to your backpack and a shop.",
+    "For your sake, explore it!"
+]
 
     # add desert music
     pygame.mixer.music.load("audio/desertbgmusic.wav")
@@ -67,7 +77,7 @@ def shed(player, selected_character, bg_width,overlay_visible, map_visible):
     # Main loop
     running = True
 
-    while running and overlay_visible and not map_visible:
+    while running and not player.seen_message:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -78,6 +88,7 @@ def shed(player, selected_character, bg_width,overlay_visible, map_visible):
 
         if pygame.time.get_ticks() - start_time >= 1000:  # After 10 seconds, the loop of start message ends
             running = False
+            player.seen_message = True
 
         # Update the display (if needed)
         pygame.display.flip()
@@ -106,7 +117,7 @@ def shed(player, selected_character, bg_width,overlay_visible, map_visible):
                     player.user_laser= False
                     return "backpack"#Enter the backpack
 
-                # Start laser on KEYDOWN
+                # Start laser on KEYDOWN (only on level 2)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE and player.weapon == "Laser" and player.use_laser:
                     if not lasers:  # Fire laser if not already active
@@ -118,33 +129,29 @@ def shed(player, selected_character, bg_width,overlay_visible, map_visible):
                 if event.key == pygame.K_SPACE:
                     lasers.empty()  # Remove the laser when SPACE is released
 
-        #shooting logic
-        if pygame.mouse.get_pressed()[0]:
-            if player.bullet_cooldown<=0:
-                bullet= Bullet(player.rect.centerx, player.rect.centery, 0)
-                bullets.add(bullet)
-                player.bullet_cooldown=fps//5
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
+                if player.weapon == "Grenade":
+                    target_pos = pygame.mouse.get_pos()
+                    grenade_ex = Grenade(player.rect.x, player.rect.y, target_pos)
+                    grenade.add(grenade_ex)
 
-        #reduce bullet cooldown timer
-        if player.bullet_cooldown>0:
-            player.bullet_cooldown-=1
+
+
+
 
         #update and draw all sprites
-        player_group.update()
-        bullets.update()
+        player_group.update(level=2)
         lasers.update(player)
+        grenade.update(player)
 
-
-
-        player_group.draw(screen)  # Draw the player on the screen
-        bullets.draw(screen)
+        player_group.draw(screen)
         lasers.draw(screen)
-        # Update the player's position
-        #           player.update()
+        grenade.draw(screen)
+
         #Show backpack on a specific position
         screen.blit(backpack_img,backpack_rect.topleft)# Blit the image at the top-left of the rect
 
-        if overlay_visible:
+        if not player.glasses_used:
             # Create a white overlay
             overlay = pygame.Surface(resolution)
             overlay.fill(white)  # Fill with white
@@ -160,15 +167,16 @@ def shed(player, selected_character, bg_width,overlay_visible, map_visible):
             screen.blit(backpack_img, backpack_rect.topleft)  # Blit the image at the top-left of the rect
 
 
-        if map_visible:
+        if player.map_used:
             coins_group.draw(screen)
             cactus_group.draw(screen)
             font = pygame.font.Font(None, 20)
-            instructions = font.render("You have no money or weapons. Catch the coins and watch out for the cactus!", True,deep_black)
+            instructions = font.render("Catch the coins to buy weapons and watch out for the cactus or other surprises!", True,deep_black)
             instructions_rect = instructions.get_rect()
             instructions_rect.center = (width// 2-30, 50)
             screen.blit(instructions, instructions_rect)
-            monster.update()
+            stop_pos = (0,0)
+            monster.update(stop_pos)
             monster.draw(screen)
             warning_text = ""
 
@@ -180,13 +188,10 @@ def shed(player, selected_character, bg_width,overlay_visible, map_visible):
                 pygame.mixer.music.load("audio/monster.mp3")
                 pygame.mixer.music.play(-1)  # Start playing  in a loop
 
-            if monster_ex.rect.x <= 950:
+            if monster_ex.rect.x <= 950 and monster_ex.is_alive:
                 warning_text = "It's the desert monster who protects the Solanum! Make sure you're not empty handed."
 
-            warning = font.render(warning_text, True, deep_black)
-            warning_rect = warning.get_rect()
-            warning_rect.center = (width // 2 - 50, 90)
-            screen.blit(warning, warning_rect)
+
 
             # Cactus collisions
 
@@ -202,22 +207,50 @@ def shed(player, selected_character, bg_width,overlay_visible, map_visible):
             if collided_coins:
                 player.money += 30
                 for coin in collided_coins:
+                    coin.is_alive = False
                     coin.kill()
 
             #Monster collisions
 
             collided_monster = pygame.sprite.spritecollide(player, monster, False)
             if collided_monster:
-                return "death"
+                if monster_ex.is_alive:
+                    return "death"
+                else:
+                    return "level 3"
 
             # Laser collisions
-            #for laser in lasers:
-                #collided_enemies = pygame.sprite.spritecollide(laser, monster, False)
-                #monster_ex.health -= 30  # Lasers deal more damage
-                #if monster_ex.health <= 0:
-                    #monster_ex.kill()
+            for laser in lasers:
+                cactus_laser = pygame.sprite.spritecollide(laser, cactus_group, False)
+                if cactus_laser:
+                    for cactus in cactus_group:
+                        cactus.kill()
+                        cactus.is_alive = False
+                monster_laser = pygame.sprite.spritecollide(laser, monster, False)
+                if monster_laser:
+                    monster_ex.rect.x += 10
+
+            #Grenade collisions
+            for grenade_ex in grenade:
+                monster_grenade = pygame.sprite.spritecollide(grenade_ex, monster,False)
+                if monster_grenade:
+                    pygame.mixer.music.stop()
+                    pygame.mixer.music.load("audio/grenade_sound.wav")
+                    pygame.mixer.music.play(0)  # Play music once
+                    player.weapon = "None"
+                    monster_ex.image = solanum #changing the image of the monster to the image of solanum
+                    stop_pos = grenade_ex.rect.topleft  # Making it stop where it was "killed"
+                    monster_ex.kill_monster(stop_pos)  # Call the method to stop the monster
+                    warning_text = "You've found Solanum! Harvest it to continue the mission."
+
+            warning = font.render(warning_text, True, deep_black)
+            warning_rect = warning.get_rect()
+            warning_rect.center = (width // 2 - 50, 90)
+            screen.blit(warning, warning_rect)
 
 
+        # Apply brightness and sound settings dynamically
+        apply_brightness_and_sound(screen)
 
         pygame.display.flip()
 

@@ -14,6 +14,10 @@ def user_info(player,screen,during_message):
     # Displaying player's health
     background = pygame.image.load("img/woodinfo.png")
     screen.blit(background,(0,570))
+
+    # Apply brightness and sound settings dynamically
+    apply_brightness_and_sound(screen)
+
     if during_message:
         font3 = pygame.font.Font(None, 24)
         data = "GATHERING PLAYER'S DATA..."

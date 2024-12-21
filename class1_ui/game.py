@@ -9,22 +9,24 @@ from puzzle_message import *
 from death import death
 from user_info import *
 from surprise_pup import Surprise
-
+from level3 import *
 def character_selection_screen():
     # Screen setup
     screen = pygame.display.set_mode(resolution)
+
+
 
     # Load character images
     girl_image = pygame.image.load("img/lucaquinn_female.jpg")  # Correct image path for girl character
     boy_image = pygame.image.load("img/lucaquinn_male.jpg")  # Correct image path for boy character
 
     # Scale images
-    girl_image = pygame.transform.scale(girl_image, (150, 150))
-    boy_image = pygame.transform.scale(boy_image, (150, 150))
+    girl_image = pygame.transform.scale(girl_image, (170, 170))
+    boy_image = pygame.transform.scale(boy_image, (170, 170))
 
     # Positions
-    girl_rect = girl_image.get_rect(center=(width // 3, height // 2))
-    boy_rect = boy_image.get_rect(center=(2 * width // 3, height // 2))
+    girl_rect = girl_image.get_rect(center=(width // 3, 240))
+    boy_rect = boy_image.get_rect(center=(2 * width // 3, 240))
 
     selected_character = None  # To store the choice
     character_image_path = None  # Store the selected image path
@@ -35,13 +37,29 @@ def character_selection_screen():
 
         # Draw instructions
         font = pygame.font.Font(None, 36)
-        text = font.render("Choose your character", True, (255, 255, 255))
-        text_rect = text.get_rect(center=(width // 2, height // 4))
+        text = font.render("CHOOSE YOUR CHARACTER", True, white)
+        text_rect = text.get_rect(center=(width // 2, 80))
         screen.blit(text, text_rect)
 
         # Draw character images
         screen.blit(girl_image, girl_rect)
         screen.blit(boy_image, boy_rect)
+
+        #Instruction panel
+        font2 = pygame.font.Font(None, 26)
+        title_movement = font.render("Player Movement", True, greenish)
+        text_movement = font2.render("PRESS A to go left, PRESS D to go right, PRESS W to go up, PRESS S to go down", True, glowing_light_red)
+        title_weapons = font.render("Weapons Handling", True, greenish)
+        text_bullet = font2.render("For Bullets PRESS MOUSE LEFT BUTTON(various directions)", True, glowing_light_red)
+        text_laser = font2.render("For Laser PRESS SPACE BAR", True, glowing_light_red)
+        text_grenade = font2.render("Grenade PRESS MOUSE LEFT BUTTON on desired target(one shot for each grenade)", True, glowing_light_red)
+
+        screen.blit(title_movement,title_movement.get_rect(center=(width // 2, 400)))
+        screen.blit(text_movement, text_movement.get_rect(center=(width // 2, 450)))
+        screen.blit(title_weapons, title_weapons.get_rect(center=(width // 2, 500)))
+        screen.blit(text_bullet, text_bullet.get_rect(center=(width // 2, 550)))
+        screen.blit(text_laser, text_laser.get_rect(center=(width // 2, 600)))
+        screen.blit(text_grenade, text_grenade.get_rect(center=(width // 2, 650)))
 
         # Event handling
         for event in pygame.event.get():
@@ -56,26 +74,28 @@ def character_selection_screen():
                     selected_character = "boy"  # Set to "boy"
                     character_image_path = "img/male-removebg-preview__1_-removebg-preview.png"  # Store the image path
 
+        # Apply brightness and sound settings dynamically
+        apply_brightness_and_sound(screen)
+
         pygame.display.flip()
         clock.tick(30)
 
-    return character_image_path  # Return the image path, not just the character name
+    return selected_character,character_image_path  # Return the image path, not just the character name
 
 def game_loop(interface_callback):
     # Character selection
-    selected_character = character_selection_screen()  # Returns image path
+    selected_character,character_image_path = character_selection_screen()  # Returns image path
 
-    # Debugging: Check if image path was correctly selected
-    print(f"Character image path: {selected_character}")  # Debugging output
+
 
     # SETUP:
-    # Load the background image and get its size (bg_width, bg_height)
+    # Load the background image
     background = pygame.image.load("img/backroundscenario.jpg")  # Make sure this path is correct
-    bg_width, bg_height = background.get_size()  # Get the dimensions of the background image
 
-    # Create the player with the selected image path, and pass bg_width. bg_height is already defined in the function player.
-    player = Player(bg_width, selected_character)  # Pass image path directly
 
+    # Create the player with the selected image path
+    player = Player()  # Pass image path directly
+    player.set_character(selected_character,character_image_path)
     # Show start message after character selection
     level1_title = "Level 1: 'The Map'"
     level1_description = [
@@ -114,7 +134,6 @@ def game_loop(interface_callback):
             running = False
 
 
-
         # Update the display (if needed)
         pygame.display.flip()
         pygame.time.delay(30) #delay to reduce resource usage
@@ -124,36 +143,37 @@ def game_loop(interface_callback):
 
     while True:
         if current_state == "main":
-            current_state = execute_game(player, selected_character, interface_callback)
+            current_state = execute_game(player, interface_callback)
         elif current_state == "puzzle_message":
-            current_state = puzzle_message(background, player, selected_character, bg_width)
+            current_state = puzzle_message(background, player)
         elif current_state == "puzzle_game":
-            current_state = puzzle_game(screen, player, selected_character, bg_width)
-        elif current_state == "shed_light":
-            current_state = shed(player, selected_character, bg_width,True,False)
-        elif current_state == "shed_normal":
-            current_state = shed(player, selected_character, bg_width,False,False)
-        elif current_state == "shed_map":
-            current_state = shed(player, selected_character, bg_width, False, True)
+            current_state = puzzle_game(screen)
+        elif current_state == "shed":
+            current_state = shed(player)
         elif current_state == "backpack":
-            current_state = backpack(screen, player, selected_character, bg_width)
+            current_state = backpack(screen, player)
         elif current_state == "shop":
-            current_state = shop_window(screen, player, selected_character, bg_width)
+            current_state = shop_window(screen, player)
         elif current_state == "death":
             current_state = death(interface_callback)
+        elif current_state == "level3":
+            current_state = run_level3(screen,player)
+
+        # applying brightness and sound settings in each loop iteration
+        apply_brightness_and_sound(screen)
+        pygame.display.flip()
 
 
-def execute_game(player: Player = None, character_image_path=None, interface_callback=None):
+def execute_game(player, interface_callback=None):
     # SETUP:
 
     # Setting up the background
     background = pygame.image.load("img/backroundscenario.jpg")
-    bg_width, bg_height = background.get_size()
 
     # Create the player with the selected character image
     if player is None:
-        player = Player(bg_width, character_image_path)
-
+        player = Player()
+    player.level = 1
     # Screen setup
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode(resolution)
@@ -178,10 +198,13 @@ def execute_game(player: Player = None, character_image_path=None, interface_cal
 
 
     # Max countdown time for survival
-    countdown_time = 10
+    countdown_time = 60
     start_time = time.time()
-
+    start_time_pup = 3000000 #so it doesn't stop before the collision
     running = True
+    pup_count =  0
+    # Initialize powerup to None
+    powerup = None
     while running:
         clock.tick(fps)
 
@@ -202,6 +225,7 @@ def execute_game(player: Player = None, character_image_path=None, interface_cal
             surprise.add(surprise_ex)  # Add it to the group
             speed_boost = True  # Set to true so that the powerup is speed boost
             surprise_count += 1
+
             print("incoming surprise....")
 
 
@@ -227,17 +251,17 @@ def execute_game(player: Player = None, character_image_path=None, interface_cal
 
         # Move background for parallax effect
         bg_x -= 5 #equal to player's speed in a normal situation
-        if bg_x <= -bg_width:
+        if bg_x <= -player.bg_width:
             bg_x = 0
         screen.blit(background, (bg_x, 0))
-        screen.blit(background, (bg_x + bg_width, 0))
+        screen.blit(background, (bg_x + player.bg_width, 0))
 
         # Display player info
         user_info(player, screen, False)
 
         # Render countdown timer
         font = pygame.font.Font(None, 46)
-        timer_text = font.render(f"{remaining_time // 10}:{remaining_time % 10:02d}", True, deep_black)
+        timer_text = font.render(f"{remaining_time // 60}:{remaining_time % 60:02d}", True, deep_black)
         screen.blit(timer_text, (width // 2 - timer_text.get_width() // 2, 10))
 
         # Player shooting (bullets and lasers)
@@ -252,9 +276,8 @@ def execute_game(player: Player = None, character_image_path=None, interface_cal
         enemy_cooldown -= 1
 
         # Update all groups
-        player_group.update()
+        player_group.update(level=1)
         bullets.update()
-        lasers.update(player)
         enemies.update(player)
 
 
@@ -262,11 +285,13 @@ def execute_game(player: Player = None, character_image_path=None, interface_cal
         player_group.draw(screen)
         enemies.draw(screen)
         bullets.draw(screen)
-        lasers.draw(screen)
+
 
         # Draw the surprise balloon if the flag is set
         surprise.update()  # Update the surprise balloon
         surprise.draw(screen)  # Draw the surprise balloon
+
+
 
         # Bullet collisions
         for bullet in bullets:
@@ -277,13 +302,6 @@ def execute_game(player: Player = None, character_image_path=None, interface_cal
                 if enemy.health <= 0:
                     enemy.kill()
 
-        # Laser collisions
-        for laser in lasers:
-            collided_enemies = pygame.sprite.spritecollide(laser, enemies, False)
-            for enemy in collided_enemies:
-                enemy.health -= 30  # Lasers deal more damage
-                if enemy.health <= 0:
-                    enemy.kill()
 
         # Handle player collisions with enemies
         collided_enemies = pygame.sprite.spritecollide(player, enemies, False)
@@ -292,33 +310,46 @@ def execute_game(player: Player = None, character_image_path=None, interface_cal
             for drone in collided_enemies:
                 drone.kill()
 
-        # Initialize powerup to None
-        powerup = None
-
         # Check whether the surprise offers invincibility or speed boost
-        if shield and pygame.sprite.spritecollide(player, surprise, True):
-            powerup = Invincibility(15)  # Create a variable with the powerup
+        if speed_boost:
+            powerup = SpeedBoost(15)# Create a variable with the powerup
+            speed_boost = False
+        if shield:
+            powerup = Invincibility(10)  # Create a variable with the powerup
             shield = False
 
-
-        if speed_boost and pygame.sprite.spritecollide(player, surprise, True):
-            powerup = SpeedBoost(20)  # Create a variable with the powerup
-            speed_boost = False
-
-        # Handle applying the powerup
         if powerup is not None:
-            powerup.apply(player)
+            # Check for collision with surprise
+            if pygame.sprite.spritecollide(player, surprise, True):
+                powerup.apply(player)  # Apply the power-up
+                # Only apply the power-up if it hasn't been used yet
+                if pup_count == 0:
+                    pup_count +=1
+                    start_time_pup = pygame.time.get_ticks()  # Reset the start time for the power-up
+                    print("Power-up applied!")
+                elif pup_count == 2:
+                    pup_count += 1
+                    start_time_pup = pygame.time.get_ticks()  # Reset the start time for the power-up
+                    print("Power-up applied!")
 
+            elapsed_time_pup = (pygame.time.get_ticks() - start_time_pup) / 1000  # Elapsed time for power-up
+
+
+            if elapsed_time_pup >= powerup._duration and (pup_count==1 or pup_count == 3):  # After the duration
+                powerup.remove(player) #remove power up from the player
+                powerup._is_active = False
+                pup_count +=1
+                print("Power-up ended.")
 
         # Check player health
         if player.health <= 0:
             player.health = 100
             return "death"
-
-
         # Check if the player reaches the right edge
         if player.rect.right >= width:
             pygame.mixer.music.stop()
-            return "shed_light"
+            return "level3"
 
+        # Apply brightness and sound settings dynamically
+        apply_brightness_and_sound(screen)
         pygame.display.flip()

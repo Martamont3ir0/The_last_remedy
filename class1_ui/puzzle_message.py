@@ -5,7 +5,7 @@ from shed import *
 import random # For shuffling nodes
 from class1_ui.interface import interface
 
-def puzzle_game(screen,player,selected_character,bg_width):
+def puzzle_game(screen):
     """
         Displays a wire-connecting puzzle where the player connects wires to shuffled nodes.
 
@@ -21,8 +21,7 @@ def puzzle_game(screen,player,selected_character,bg_width):
         Args:
             screen (pygame.Surface): The game screen surface to render the puzzle.
             player:
-            selected_character:
-            bg_width:
+
 
         Returns:
             function shed if the puzzle is solved, or triggers a retry/reset if the timer runs out.
@@ -57,7 +56,7 @@ def puzzle_game(screen,player,selected_character,bg_width):
                         exit()
 
             # Draw the prompt
-            screen.fill((30, 30, 30))
+            screen.fill(deep_black)
             screen.blit(prompt_text, (width // 2 - prompt_text.get_width() // 2, 300))
 
             # Draw buttons
@@ -67,10 +66,11 @@ def puzzle_game(screen,player,selected_character,bg_width):
             # Draw button text
             yes_text = font.render("Yes", True, (0, 0, 0))
             no_text = font.render("No", True, (0, 0, 0))
-            screen.blit(yes_text, (
-                yes_button.centerx - yes_text.get_width() // 2, yes_button.centery - yes_text.get_height() // 2))
-            screen.blit(no_text,
-                        (no_button.centerx - no_text.get_width() // 2, no_button.centery - no_text.get_height() // 2))
+            screen.blit(yes_text, (yes_button.centerx - yes_text.get_width() // 2, yes_button.centery - yes_text.get_height() // 2))
+            screen.blit(no_text,(no_button.centerx - no_text.get_width() // 2, no_button.centery - no_text.get_height() // 2))
+
+            # Apply brightness and sound settings dynamically
+            apply_brightness_and_sound(screen)
 
             pygame.display.flip()
 
@@ -93,6 +93,8 @@ def puzzle_game(screen,player,selected_character,bg_width):
     time_limit = 30000  # 30 seconds in milliseconds
     puzzle_bg = pygame.image.load("img/cratebg.png")
     while running:
+
+
         screen.blit(puzzle_bg,(0,0))
         current_time = pygame.time.get_ticks()
         elapsed_time = current_time - start_time
@@ -138,7 +140,7 @@ def puzzle_game(screen,player,selected_character,bg_width):
 
         if solved:
             print("Puzzle Solved!")
-            return "shed_light" #proceed to the shed after solving the puzzle
+            return "shed" #proceed to the shed after solving the puzzle
 
 
         # Display the timer
@@ -176,6 +178,9 @@ def puzzle_game(screen,player,selected_character,bg_width):
         screen.blit(instructions, instructions_rect)
         screen.blit(instructions2, instructions2_rect)
 
+        # Apply brightness and sound settings dynamically
+        apply_brightness_and_sound(screen)
+
         pygame.display.flip()
         clock.tick(60)
 
@@ -195,13 +200,11 @@ def show_balloon():
     return balloon_image, balloon_rect
 
 
-def puzzle_message(background, player, selected_character, bg_width):
+def puzzle_message(background, player):
     """
 
     :param background:
     :param player:
-    :param selected_character:
-    :param bg_width:
     :return:
     """
     screen = pygame.display.set_mode(resolution)
@@ -237,6 +240,9 @@ def puzzle_message(background, player, selected_character, bg_width):
 
         # Call the user_info function
         user_info(player, screen, False)
+
+        # Apply brightness and sound settings dynamically
+        apply_brightness_and_sound(screen)
 
         # Update the display
         pygame.display.flip()

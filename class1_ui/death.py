@@ -51,8 +51,6 @@ def death(interface_callback):
     quit_surface = button_font.render(quit_text, True, white)
     quit_rect = quit_surface.get_rect(center=(quit_button_x, button_y))
 
-
-
     #game loop
     waiting=True
     while waiting:
@@ -89,6 +87,9 @@ def death(interface_callback):
 
         screen.blit(restart_surface, restart_rect)
         screen.blit(quit_surface, quit_rect)
+
+        # Apply brightness and sound settings dynamically
+        apply_brightness_and_sound(screen)
 
         pygame.display.update()
 
