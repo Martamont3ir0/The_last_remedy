@@ -52,6 +52,7 @@ def death(interface_callback,player):
     quit_rect = quit_surface.get_rect(center=(quit_button_x, button_y))
 
     #game loop
+    player.health = 100 #reset health
     waiting=True
     while waiting:
         mouse=pygame.mouse.get_pos()

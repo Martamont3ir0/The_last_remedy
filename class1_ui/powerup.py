@@ -45,20 +45,14 @@ class DeSpawner(PowerUp):
 
     def affect_game(self, enemies):
 
-        if enemies:  # Check if there are still enemies left
-            enemy = enemies.sprites()[-1]  # Get the last enemy in the group
-            #enemy.kill() #kill it
 
         for enemy in enemies:
-            print(f"Before: {enemy.spawn_frequency}")  # Debugging line
-            enemy.spawn_frequency += 6
-            print(f"After: {enemy.spawn_frequency}")  # Debugging line
+            enemy.kill()
 
         print(f"DeSpawner applied.")
 
     def remove(self, player,enemies):
-        for enemy in enemies:
-            enemy.spawn_frequency -= 6
+
         player.pup = None  # Clear the power-up from the player
         player.shadow_color = (0,0,0,0)
         self._is_active = False
