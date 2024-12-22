@@ -13,150 +13,176 @@ from player import *
 
 def interface():
     """
-contains the main user interface logic:
--menus
--navigation
--screen
--Main Menu, rules screen, credits
-"""
+    Contains the main user interface logic for the game:
+    - Manages menus
+    - Handles navigation between screens
+    - Displays the main menu, rules screen, and credits
+    """
     # Initialize Pygame
     pygame.init()
 
     # Create the screen and load assets
-    screen = pygame.display.set_mode(resolution)
-    pygame.display.set_caption("The Last Remedy")
+    screen = pygame.display.set_mode(resolution)  # Set the screen size
+    pygame.display.set_caption("The Last Remedy")  # Set the window title
+
+    # Load and scale the main background image
     main_background = pygame.image.load(image_files["main_background"])
     main_background = pygame.transform.scale(main_background, resolution)
-    overlay = pygame.Surface(resolution, pygame.SRCALPHA)
-    overlay.fill((0, 0, 0, 128))
 
-    # Play background music
+    # Create an overlay for the screen (for things like dimming during transitions)
+    overlay = pygame.Surface(resolution, pygame.SRCALPHA)
+    overlay.fill((0, 0, 0, 128))  # Semi-transparent black overlay
+
+    # Play background music (loops indefinitely)
     pygame.mixer.music.load("audio/Star Wars IV A new hope - Binary Sunset (Force Theme).mp3")
     pygame.mixer.music.play(-1)
 
-    # Fonts
+    # Set up fonts for different UI text
     bookantiqua = pygame.font.SysFont("bookantiqua", 40)
     title_font = pygame.font.SysFont(*fonts["title_font"])
     start_game_font = pygame.font.SysFont("perpetua", 50)
 
-    # Variables
+    # Initialize variables for fade effects (e.g., fade-in/out)
     fade_alpha = 255
-    fade_delta = -5
+    fade_delta = -5  # Change in alpha value to control fade speed
 
-
-    # Main loop
+    # Main loop for displaying the interface
     while True:
-        mouse = pygame.mouse.get_pos()
+        mouse = pygame.mouse.get_pos()  # Get current mouse position
 
-        # Event handling
+        # Event handling (listening for user input)
         for ev in pygame.event.get():
             if ev.type == pygame.QUIT:
+                # Handle quitting the game
                 pygame.quit()
                 return
+
             if ev.type == pygame.MOUSEBUTTONDOWN:
-                if start_hover.collidepoint(mouse):
-                    # load
+                # Handle mouse button down events (user clicks)
+                if start_hover.collidepoint(mouse):  # Start button hover
+                    # Attempt to load saved game state
                     save_data = load_game()
                     if save_data:
-                        # Restore game state
-                        player = Player(save_data["health"],save_data["money"],save_data["state"],save_data["character"],save_data["type"])
+                        # Restore the player state from the saved data
+                        player = Player(save_data["health"], save_data["money"], save_data["state"], save_data["character"], save_data["type"])
                     else:
-                        player = Player(100,10,"main","img/female-removebg-preview.png","Girl") #as default character before its chosen
-                    game_loop(interface,player,save_data["state"])
+                        # Create a default player if no saved game is found
+                        player = Player(100, 10, "main", "img/female-removebg-preview.png", "Girl")  # Default character
+                    game_loop(interface, player, save_data["state"])  # Start the game loop with the player
                     return
-                elif credits_hover.collidepoint(mouse):
-                    credits_(screen)
+
+                elif credits_hover.collidepoint(mouse):  # Credits button hover
+                    credits_(screen)  # Show the credits screen
                     return
-                elif quit_hover.collidepoint(mouse):
-                    if not confirm_quit(screen):
+
+                elif quit_hover.collidepoint(mouse):  # Quit button hover
+                    if not confirm_quit(screen):  # Confirm quit action
                         return
-                elif rules_hover.collidepoint(mouse):
-                    rules(screen, main_background, overlay, title_font)
+
+                elif rules_hover.collidepoint(mouse):  # Rules button hover
+                    rules(screen, main_background, overlay, title_font)  # Show the rules screen
                     return
-                elif options_hover.collidepoint(mouse):
-                    setting_menus(screen)
+
+                elif options_hover.collidepoint(mouse):  # Options button hover
+                    setting_menus(screen)  # Show the settings/options menu
+
             elif ev.type == pygame.MOUSEBUTTONUP:
-                # Handle button clicks
-                if start_hover.collidepoint(mouse):
-                    game_loop(interface)
+                # Handle mouse button release events (user has clicked and released)
+                if start_hover.collidepoint(mouse):  # Start button clicked
+                    game_loop(interface)  # Start the game loop
                     return
-                elif  credits_hover.collidepoint(mouse):
-                    credits_(screen)
+                elif credits_hover.collidepoint(mouse):  # Credits button clicked
+                    credits_(screen)  # Show the credits screen
                     return
-                elif  quit_hover.collidepoint(mouse):
-                    if not confirm_quit(screen):
+                elif quit_hover.collidepoint(mouse):  # Quit button clicked
+                    if not confirm_quit(screen):  # Confirm quit action
                         return
-                elif  rules_hover.collidepoint(mouse):
-                    rules(screen, main_background, overlay, title_font)
+                elif rules_hover.collidepoint(mouse):  # Rules button clicked
+                    rules(screen, main_background, overlay, title_font)  # Show the rules screen
                     return
-                elif  options_hover.collidepoint(mouse):
-                    under_construction(screen)
+                elif options_hover.collidepoint(mouse):  # Options button clicked
+                    under_construction(screen)  # Show "under construction" message
                     return
 
         # Draw background and overlay
-        screen.fill(deep_black)
-        screen.blit(main_background, (0, 0))
-        screen.blit(overlay, (0, 0))
+        screen.fill(deep_black)  # Fill the screen with a deep black background
+        screen.blit(main_background, (0, 0))  # Draw the main background image
+        screen.blit(overlay, (0, 0))  # Apply a semi-transparent overlay for effects
 
         # Title with glowing effect
         glowing_title(
-            screen, title_font, "The Last Remedy",
-            (resolution[0] // 2, 100), text_color=deep_black,
-            glow_color=(0, 255, 0), shadow_color=white
+            screen, title_font, "The Last Remedy",  # Display the title text
+            (resolution[0] // 2, 100),  # Position the title at the center horizontally, 100px from the top
+            text_color=deep_black,  # Title text color (dark black)
+            glow_color=(0, 255, 0),  # Green glow around the text
+            shadow_color=white  # White shadow effect
         )
 
         # Pulsing Start Game button
-        fade_alpha += fade_delta
-        if fade_alpha <= 100 or fade_alpha >= 255:
+        fade_alpha += fade_delta  # Change the fade alpha value for the pulsing effect
+        if fade_alpha <= 100 or fade_alpha >= 255:  # If alpha is out of bounds, reverse the fade direction
             fade_delta *= -1
-        fade_alpha = max(100, min(255, fade_alpha))
+        fade_alpha = max(100, min(255, fade_alpha))  # Clamp the fade alpha value to stay within 100-255
 
-        start_button_x = resolution[0] // 2
-        start_button_y = 340
-        start_hover = pygame.Rect(start_button_x - 100, start_button_y - 20, 200, 40)
-        is_hover = start_hover.collidepoint(mouse)
-        start_button_color = (128, 255, 128) if is_hover else white
-        start_text = start_game_font.render("Start Game", True, start_button_color)
-        start_text.set_alpha(fade_alpha)
-        screen.blit(start_text, start_hover.topleft)
+        # Define the position and size of the "Start Game" button
+        start_button_x = resolution[0] // 2  # Center the button horizontally
+        start_button_y = 340  # Position the button 340px from the top
+        start_hover = pygame.Rect(start_button_x - 100, start_button_y - 20, 200,
+                                  40)  # Define the clickable area for the button
+        is_hover = start_hover.collidepoint(mouse)  # Check if the mouse is hovering over the button
+        start_button_color = (128, 255, 128) if is_hover else white  # Change button color if hovered
+        start_text = start_game_font.render("Start Game", True, start_button_color)  # Render the text for the button
+        start_text.set_alpha(fade_alpha)  # Set the alpha value to control the pulsing effect
+        screen.blit(start_text, start_hover.topleft)  # Draw the "Start Game" button on the screen
 
-        # Other buttons
-        rules_hover = pygame.Rect(resolution[0] // 4 - 90, 500 - 30, 180, 60)
-        options_hover = pygame.Rect(resolution[0] // 4 - 90, 600 - 30, 180, 60)
-        credits_hover = pygame.Rect((resolution[0] // 4) * 3 - 90, 500 - 30, 180, 60)
-        quit_hover = pygame.Rect((resolution[0] // 4) * 3 - 90, 600 - 30, 180, 60)
+        # Define the clickable areas for other buttons
+        rules_hover = pygame.Rect(resolution[0] // 4 - 90, 500 - 30, 180, 60)  # "Rules" button position
+        options_hover = pygame.Rect(resolution[0] // 4 - 90, 600 - 30, 180, 60)  # "Options" button position
+        credits_hover = pygame.Rect((resolution[0] // 4) * 3 - 90, 500 - 30, 180, 60)  # "Credits" button position
+        quit_hover = pygame.Rect((resolution[0] // 4) * 3 - 90, 600 - 30, 180, 60)  # "Quit" button position
 
+        # Draw each button with the specified properties
         draw_buttons(
-            screen, "Story", rules_hover, bookantiqua,
+            screen, "Story", rules_hover, bookantiqua,  # Draw "Story" button
+            base_color=(0, 150, 0), text_color=white,  # Default colors for the button
+            hover_color=(50, 255, 50), mouse_pos=mouse  # Hover effect colors
+        )
+        draw_buttons(
+            screen, "Options", options_hover, bookantiqua,  # Draw "Options" button
             base_color=(0, 150, 0), text_color=white,
             hover_color=(50, 255, 50), mouse_pos=mouse
         )
         draw_buttons(
-            screen, "Options", options_hover, bookantiqua,
+            screen, "Credits", credits_hover, bookantiqua,  # Draw "Credits" button
             base_color=(0, 150, 0), text_color=white,
             hover_color=(50, 255, 50), mouse_pos=mouse
         )
         draw_buttons(
-            screen, "Credits", credits_hover, bookantiqua,
-            base_color=(0, 150, 0), text_color=white,
-            hover_color=(50, 255, 50), mouse_pos=mouse
-        )
-        draw_buttons(
-            screen, "Quit", quit_hover, bookantiqua,
+            screen, "Quit", quit_hover, bookantiqua,  # Draw "Quit" button
             base_color=(0, 150, 0), text_color=white,
             hover_color=(50, 255, 50), mouse_pos=mouse
         )
 
+        # Apply any brightness or sound effects to the screen
         apply_brightness_and_sound(screen)
-        # Update display
+
+        # Update the display with the new changes
         pygame.display.update()
+
+        # Add a short delay to control the refresh rate of the screen
         pygame.time.delay(30)
+
 
 def rules(screen, main_background, overlay, title_font):
     """
     Display the rules screen with background story slides.
+
+    This function handles the display of the rules screen, cycling through
+    story slides that describe the game's plot and world. Users can navigate
+    through the slides using 'Previous' and 'Next' buttons, or return to the
+    main menu with the 'Back to Menu' button.
     """
-    # Story paragraphs
+    # Story paragraphs defining the background and plot of the game
     story_slides = [
         ["Background Story..."],
         ["The World is Dying.",
@@ -174,8 +200,9 @@ def rules(screen, main_background, overlay, title_font):
         ["You Are the Last Hope."],
         ["You play as a former scientist who once worked on the Elixir project.",
          "The Coalition shut it down, erased the research, and destroyed your life."],
-        ["Now, after years of hiding, you’ve learned of the missing ingredient—Solanum—and its location deep within the Wastes,",
-         "a desolate region devastated by radiation. If you can retrieve it, you can complete the Elixir and change the world."],
+        [
+            "Now, after years of hiding, you’ve learned of the missing ingredient—Solanum—and its location deep within the Wastes,",
+            "a desolate region devastated by radiation. If you can retrieve it, you can complete the Elixir and change the world."],
         ["But you’re not alone.",
          "The Coalition’s Sentinels will stop at nothing to prevent you from reaching the plant.",
          "And there are others—mercenaries, factions, and desperate survivors—who want the Elixir for themselves."],
@@ -183,78 +210,77 @@ def rules(screen, main_background, overlay, title_font):
         ["Are you ready to save the world?"]
     ]
 
-    text_font = pygame.font.SysFont("timesnewroman", 30)
-    slide_index = 0
-    clicked_button = None
-
+    text_font = pygame.font.SysFont("timesnewroman", 30)  # Font for the slide text
+    slide_index = 0  # Index for tracking the current slide
+    clicked_button = None  # Track the button clicked by the user
 
     while True:
-        mouse = pygame.mouse.get_pos()
+        mouse = pygame.mouse.get_pos()  # Get the current mouse position
 
         # Event handling
         for ev in pygame.event.get():
             if ev.type == pygame.QUIT:
-                pygame.quit()
+                pygame.quit()  # Close the game if the user quits
                 return
             if ev.type == pygame.MOUSEBUTTONDOWN:
-                if back_hover.collidepoint(mouse):
+                if back_hover.collidepoint(mouse):  # If clicked on 'Back To Menu'
                     clicked_button = "Back To Menu"
-                elif prev_hover.collidepoint(mouse):
+                elif prev_hover.collidepoint(mouse):  # If clicked on 'Previous'
                     clicked_button = "Previous"
-                elif next_hover.collidepoint(mouse):
+                elif next_hover.collidepoint(mouse):  # If clicked on 'Next'
                     clicked_button = "Next"
             elif ev.type == pygame.MOUSEBUTTONUP:
+                # Button actions on mouse button release
                 if clicked_button == "Back To Menu" and back_hover.collidepoint(mouse):
-                    interface()
+                    interface()  # Go back to the main menu
                     return
                 elif clicked_button == "Previous" and prev_hover.collidepoint(mouse) and slide_index > 0:
-                    slide_index -= 1
-                elif clicked_button == "Next" and next_hover.collidepoint(mouse) and slide_index < len(story_slides) - 1:
-                    slide_index += 1
-                clicked_button = None
+                    slide_index -= 1  # Go to the previous slide
+                elif clicked_button == "Next" and next_hover.collidepoint(mouse) and slide_index < len(
+                        story_slides) - 1:
+                    slide_index += 1  # Go to the next slide
+                clicked_button = None  # Reset clicked button
 
         # Draw the background and overlay
-        screen.blit(main_background, (0, 0))
-        screen.blit(overlay, (0, 0))
+        screen.blit(main_background, (0, 0))  # Fill the screen with the main background image
+        screen.blit(overlay, (0, 0))  # Apply the overlay on top for effects
 
         # Draw the current slide
-        slide = story_slides[slide_index]
-        draw_slide(screen, slide, text_font, white, 50, 100, width- 100, 30)
+        slide = story_slides[slide_index]  # Get the text for the current slide
+        draw_slide(screen, slide, text_font, white, 50, 100, width - 100, 30)  # Draw the slide text
 
-        # Button positions
+        # Button positions (bottom of the screen)
         button_y = resolution[1] - 60
         back_x = 50
-        prev_x = resolution[0] // 2+100
+        prev_x = resolution[0] // 2 + 100
         next_x = resolution[0] // 2 + 260
 
-        #back to menu button
-        back_hover= pygame.Rect(back_x, button_y, 150,40)
-        is_hover_back= back_hover.collidepoint(mouse)
-        back_text_color= (50,255,50) if is_hover_back else white
-        back_text_surface= text_font.render("Back To Menu", True, back_text_color)
-        screen.blit(back_text_surface, (back_x, button_y))
+        # "Back to Menu" button
+        back_hover = pygame.Rect(back_x, button_y, 150, 40)  # Rectangle for the button
+        is_hover_back = back_hover.collidepoint(mouse)  # Check if mouse is hovering over the button
+        back_text_color = (50, 255, 50) if is_hover_back else white  # Change color when hovered
+        back_text_surface = text_font.render("Back To Menu", True, back_text_color)  # Render button text
+        screen.blit(back_text_surface, (back_x, button_y))  # Display the button text
 
-        #previous button
-        prev_hover= pygame.Rect(prev_x, button_y, 100,40)
-        is_hover_prev= prev_hover.collidepoint(mouse)
-        prev_text_color= (50,255,50) if is_hover_prev else white
-        prev_text_surface= text_font.render("Previous", True, prev_text_color)
+        # "Previous" button
+        prev_hover = pygame.Rect(prev_x, button_y, 100, 40)
+        is_hover_prev = prev_hover.collidepoint(mouse)
+        prev_text_color = (50, 255, 50) if is_hover_prev else white
+        prev_text_surface = text_font.render("Previous", True, prev_text_color)
         screen.blit(prev_text_surface, (prev_x, button_y))
 
-        #next button
-        next_hover= pygame.Rect(next_x, button_y, 100,40)
-        is_hover_next= next_hover.collidepoint(mouse)
-        next_text_color= (50,255,50) if is_hover_next else white
-        next_text_surface= text_font.render("Next",True, next_text_color)
+        # "Next" button
+        next_hover = pygame.Rect(next_x, button_y, 100, 40)
+        is_hover_next = next_hover.collidepoint(mouse)
+        next_text_color = (50, 255, 50) if is_hover_next else white
+        next_text_surface = text_font.render("Next", True, next_text_color)
         screen.blit(next_text_surface, (next_x, button_y))
 
         # Apply brightness and sound settings dynamically
         apply_brightness_and_sound(screen)
 
-        # Update display
-        pygame.display.update()
-
-
+        # Update the display
+        pygame.display.update()  # Refresh the screen with the latest updates
 
 
 def credits_(screen):

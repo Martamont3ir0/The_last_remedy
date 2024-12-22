@@ -2,20 +2,36 @@
 # Config file for global constants and settings
 import pygame
 
+
 def apply_brightness_and_sound(screen):
     """
     Apply the current brightness and sound settings globally.
+
+    This function adjusts the screen brightness by overlaying a transparent
+    surface with varying opacity and also adjusts the sound volume of the game.
+
+    Args:
+        screen (pygame.Surface): The Pygame screen where the brightness overlay
+                                  will be applied.
     """
 
     # Apply brightness overlay
-    brightness_value = game_settings.get("brightness", 1.0)  # Default to full brightness if not set
-    brightness_overlay = pygame.Surface(resolution, pygame.SRCALPHA)
-    brightness_alpha = int((1 - brightness_value) * 255)  # Calculate alpha value
-    brightness_overlay.fill((0, 0, 0, brightness_alpha))  # Apply brightness dimming
-    screen.blit(brightness_overlay, (0, 0))
+    brightness_value = game_settings.get("brightness",
+                                         1.0)  # Retrieve the brightness setting (default is 1.0 for full brightness)
 
-    # Apply sound volume
-    pygame.mixer.music.set_volume(game_settings.get("sound_volume", 0.5))  # Default to 50% if not set
+    # Create an overlay surface that matches the screen resolution and supports transparency
+    brightness_overlay = pygame.Surface(resolution, pygame.SRCALPHA)
+
+    # Calculate the alpha value based on the brightness setting (darker means lower brightness)
+    brightness_alpha = int((1 - brightness_value) * 255)  # Inverse of brightness, 0 is fully bright, 255 is fully dim
+
+    # Fill the overlay with black color and adjust its transparency based on the brightness
+    brightness_overlay.fill((0, 0, 0, brightness_alpha))  # Apply transparency (alpha) to darken the screen
+    screen.blit(brightness_overlay, (0, 0))  # Blit (draw) the brightness overlay on the screen
+
+    # Apply sound volume setting
+    sound_volume = game_settings.get("sound_volume", 0.5)  # Retrieve the sound volume setting (default is 0.5 for 50%)
+    pygame.mixer.music.set_volume(sound_volume)  # Set the global music volume in the mixer to the desired level
 
 
 # COLORS
