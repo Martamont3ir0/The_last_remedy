@@ -198,6 +198,7 @@ def execute_game(player, interface_callback=None):
     #creating our level 1 powerup variables so that they can be examined later
     speed_boost = False
     shield = False
+    de_spawner = False
     surprise = pygame.sprite.Group()
 
 
@@ -224,7 +225,7 @@ def execute_game(player, interface_callback=None):
         remaining_time = max(0, countdown_time - int(elapsed_time))
 
         #at a certain time, the surprise balloon must appear
-        if remaining_time == 45 and surprise_count == 0:
+        if remaining_time == 48 and surprise_count == 0:
             surprise_ex = Surprise()  # Create a new surprise balloon
             surprise.add(surprise_ex)  # Add it to the group
             speed_boost = True  # Set to true so that the powerup is speed boost
@@ -232,12 +233,17 @@ def execute_game(player, interface_callback=None):
 
             print("incoming surprise....")
 
-
-
-        if remaining_time == 25 and surprise_count == 1:
+        if remaining_time == 35 and surprise_count == 1:
             surprise_ex = Surprise()  # Create a new surprise balloon
             surprise.add(surprise_ex)  # Add it to the group
             shield = True  # Set to true so that the powerup is invincibility
+            surprise_count += 1
+            print("incoming surprise....")
+
+        if remaining_time == 20 and surprise_count == 2:
+            surprise_ex = Surprise()  # Create a new surprise balloon
+            surprise.add(surprise_ex)  # Add it to the group
+            de_spawner = True  # Set to true so that the powerup is de-spawner
             surprise_count += 1
             print("incoming surprise....")
 
@@ -250,8 +256,6 @@ def execute_game(player, interface_callback=None):
             pygame.mixer.music.stop()
             return "puzzle_message"
 
-        # Clear the screen
-        screen.fill((0, 0, 0))
 
         # Move background for parallax effect
         bg_x -= 5 #equal to player's speed in a normal situation
@@ -276,7 +280,7 @@ def execute_game(player, interface_callback=None):
         if enemy_cooldown <= 0:
             enemy = Enemy()
             enemies.add(enemy)
-            enemy_cooldown = fps * 2  # Cooldown reset
+            enemy_cooldown = fps * enemy.spawn_frequency  # Cooldown reset
         enemy_cooldown -= 1
 
         # Update all groups
@@ -284,6 +288,7 @@ def execute_game(player, interface_callback=None):
         bullets.update()
         enemies.update(player)
 
+        screen.blit(player.shadow_surface, player.shadow_rect)  # Draw invisible shadow
 
         # Draw everything
         player_group.draw(screen)
@@ -314,18 +319,21 @@ def execute_game(player, interface_callback=None):
             for drone in collided_enemies:
                 drone.kill()
 
-        # Check whether the surprise offers invincibility or speed boost
+        # Check whether the surprise offers invincibility, speed boost or de-spawner
         if speed_boost:
-            powerup = SpeedBoost(15)# Create a variable with the powerup
+            powerup = SpeedBoost(10)# Create a variable with the powerup
             speed_boost = False
         if shield:
             powerup = Invincibility(10)  # Create a variable with the powerup
             shield = False
+        if de_spawner:
+            powerup = DeSpawner(10)
+            de_spawner = False
 
         if powerup is not None:
             # Check for collision with surprise
             if pygame.sprite.spritecollide(player, surprise, True):
-                powerup.apply(player)  # Apply the power-up
+                powerup.affect_player(player,enemies)  # Apply the power-up
                 # Only apply the power-up if it hasn't been used yet
                 if pup_count == 0:
                     pup_count +=1
@@ -335,12 +343,16 @@ def execute_game(player, interface_callback=None):
                     pup_count += 1
                     start_time_pup = pygame.time.get_ticks()  # Reset the start time for the power-up
                     print("Power-up applied!")
+                elif pup_count == 4:
+                    pup_count += 1
+                    start_time_pup = pygame.time.get_ticks()  # Reset the start time for the power-up
+                    print("Power-up applied!")
 
             elapsed_time_pup = (pygame.time.get_ticks() - start_time_pup) / 1000  # Elapsed time for power-up
 
 
-            if elapsed_time_pup >= powerup._duration and (pup_count==1 or pup_count == 3):  # After the duration
-                powerup.remove(player) #remove power up from the player
+            if elapsed_time_pup >= powerup._duration and (pup_count==1 or pup_count == 3 or pup_count == 5):  # After the duration
+                powerup.remove(player,enemies) #remove power up from the player
                 powerup._is_active = False
                 pup_count +=1
                 print("Power-up ended.")
@@ -349,6 +361,7 @@ def execute_game(player, interface_callback=None):
         if player.health <= 0:
             player.health = 100
             return "death"
+
         # Check if the player reaches the right edge
         if player.rect.right >= width:
             pygame.mixer.music.stop()

@@ -25,6 +25,12 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = (width // 2, height // 2)
         self.shake_counter = 0  # Counter for shake duration
+        # Shadow attributes
+        self.shadow_color = (0, 0, 0, 0)  # transparent shadow
+        self.shadow_offset = (0, 10)  # Offset for the shadow position
+        self.shadow_size = (self.rect.width, self.rect.height)  # Size of the shadow
+        self.shadow_surface = pygame.Surface(self.shadow_size, pygame.SRCALPHA)  # Create a surface with alpha
+        self.update_shadow()  # Initialize shadow surface
 
         # GAMEPLAY VARIABLES
         self.speed = 5
@@ -49,48 +55,18 @@ class Player(pygame.sprite.Sprite):
 
         #level 2 handles
         self.seen_message2 = False
-        self.monster = []
-        self.coins_group = []
-        self.cactus_group = []
+        self.shed_characters = {}
+        self.default_list = [] #for powerups and functions on levels it cant be applied enemies group
 
         #level 3 handles
         self.feelings = "Happy"
         self.seen_message3 = False
-    def save_positions(self):
-        positions = {
-            'coins': [(coin.rect.x, coin.rect.y) for coin in coin_group],
-            'cacti': [(cactus.rect.x, cactus.rect.y) for cactus in cactus_group],
-            'monsters': [(monster.rect.x, monster.rect.y) for monster in monster_group],
-        }
-        with open('positions.json', 'w') as f:
-            json.dump(positions, f)
 
-    def load_positions(self):
-        try:
-            with open('positions.json', 'r') as f:
-                positions = json.load(f)
-                # Recreate coins
-                for pos in positions['coins']:
-                    coin = Coin()
-                    coin.rect.x, coin.rect.y = pos
-                    coin_group.add(coin)
-                    all_sprites.add(coin)
+    def update_shadow(self):
+        # Update shadow surface and position
+        self.shadow_surface.fill(self.shadow_color)  # Fill with shadow color
+        self.shadow_rect = self.shadow_surface.get_rect(topleft=(self.rect.x + self.shadow_offset[0], self.rect.y + self.shadow_offset[1]))
 
-                # Recreate cacti
-                for pos in positions['cacti']:
-                    cactus = Cactus()
-                    cactus.rect.x, cactus.rect.y = pos
-                    cactus_group.add(cactus)
-                    all_sprites.add(cactus)
-
-                # Recreate monsters
-                for pos in positions['monsters']:
-                    monster = Monster()
-                    monster.rect.x, monster.rect.y = pos
-                    monster_group.add(monster)
-                    all_sprites.add(monster)
-        except FileNotFoundError:
-            print("No saved positions found. Starting fresh.")
 
     def set_character(self,character, image_path):
         """
@@ -153,7 +129,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.y += random.randint(-shake_intensity, shake_intensity)
             self.shake_counter -= 1  # Decrease the shake counter
 
-
+        self.update_shadow()  # Update shadow position based on player position
 
     def shake(self):
         """

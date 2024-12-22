@@ -4,7 +4,7 @@ from config import *
 
 class Valve(InteractiveObject):
     def __init__(self, target_pressure):
-        super().__init__(100,280,'img/valve.png',True,(230,230))
+        super().__init__(140,380,'img/valve.png',True,(120,120))
         self.pressure = 50  # Starting pressure
         self.target_pressure = target_pressure
 

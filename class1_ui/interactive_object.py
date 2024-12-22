@@ -38,7 +38,7 @@ class InteractiveObject(pygame.sprite.Sprite):
         screen.blit(self.image, self.rect)
 
         if highlight:
-            # Set the font for the interaction text
+            # Set the fonts for the interaction text
             font = pygame.font.Font(None, 36)
 
             # Create the interaction prompt text

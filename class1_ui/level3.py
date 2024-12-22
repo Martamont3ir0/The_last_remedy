@@ -48,7 +48,7 @@ def run_level3(screen,player):
 
 
     # Start Level 3 music
-    pygame.mixer.music.load("audio/city alarm.wav")
+    pygame.mixer.music.load("audio/lab_alarm.wav")
     pygame.mixer.music.set_volume(0.1)
     pygame.mixer.music.play(-1)
 

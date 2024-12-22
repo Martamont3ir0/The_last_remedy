@@ -31,26 +31,50 @@ def shed(player):
     solanum = pygame.transform.scale(solanum,(100,180))
 
     # setting up active characters
-    all_sprites = pygame.sprite.Group()
+
     player_group = pygame.sprite.Group()
     player_group.add(player)
     lasers= pygame.sprite.Group()
-    monster_ex = Monster()
-    monster = pygame.sprite.Group()
-    monster.add(monster_ex)
     grenade = pygame.sprite.Group()
-    # setting up the other characters
-
+    monster = pygame.sprite.Group()
     coins_group = pygame.sprite.Group()
-    for count in range(6):
-        coin = Coin()
-        coins_group.add(coin)
-
     cactus_group = pygame.sprite.Group()
-    for count in range(8):
-        cactus = Cactus()
-        cactus_group.add(cactus)
 
+
+    if len(player.shed_characters.keys()) == 0:  # If characters haven't already been created
+        # Store the monster instance as the key and its position as the value
+        monster_ex = Monster()
+        monster_pos = (monster_ex.rect.x, monster_ex.rect.y)
+        player.shed_characters[monster_ex] = monster_pos  # Use the sprite instance as the key
+        monster.add(monster_ex)
+
+        # Create and add coins
+        for count in range(6):
+            coin = Coin()
+            coin_pos = (coin.rect.x, coin.rect.y)
+            coins_group.add(coin)
+            player.shed_characters[coin] = coin_pos  # Use the sprite instance as the key
+
+        # Create and add cacti
+        for count in range(8):
+            cactus = Cactus()
+            cactus_pos = (cactus.rect.x, cactus.rect.y)
+            cactus_group.add(cactus)
+            player.shed_characters[cactus] = cactus_pos  # Use the sprite instance as the key
+    else:
+        # Update existing characters' positions and add them to groups
+        for item, position in player.shed_characters.items():
+            item.rect.x = position[0]  # Update x position
+            item.rect.y = position[1]  # Update y position
+
+            # Add to respective groups, depending on what class they correspond to
+            if isinstance(item, Coin):
+                coins_group.add(item)
+            elif isinstance(item, Cactus):
+                cactus_group.add(item)
+            elif isinstance(item, Monster):
+                monster_ex = item
+                monster.add(item)
 
     #ensure player has user_laser attribute
     if not hasattr(player, 'use_laser'):
@@ -176,7 +200,7 @@ def shed(player):
             instructions_rect.center = (width// 2-30, 50)
             screen.blit(instructions, instructions_rect)
             stop_pos = (0,0)
-            monster.update(stop_pos)
+            monster.update(stop_pos,player)
             monster.draw(screen)
             warning_text = ""
 
@@ -200,6 +224,9 @@ def shed(player):
                 player.take_damage(10, False)
                 for cactus in collided_cactus:
                     cactus.kill()
+                    # Remove the coin from the shed_characters dictionary using the sprite instance
+                    if cactus in player.shed_characters:
+                        player.shed_characters.pop(cactus)  # Use the sprite instance as the key
 
             # Coins collisions
 
@@ -209,6 +236,9 @@ def shed(player):
                 for coin in collided_coins:
                     coin.is_alive = False
                     coin.kill()
+                    # Remove the coin from the shed_characters dictionary using the sprite instance
+                    if coin in player.shed_characters:
+                        player.shed_characters.pop(coin)  # Use the sprite instance as the key
 
             #Monster collisions
 
@@ -217,15 +247,18 @@ def shed(player):
                 if monster_ex.is_alive:
                     return "death"
                 else:
-                    return "level 3"
+                    return "level3"
 
             # Laser collisions
             for laser in lasers:
                 cactus_laser = pygame.sprite.spritecollide(laser, cactus_group, False)
                 if cactus_laser:
-                    for cactus in cactus_group:
+                    for cactus in cactus_laser:
                         cactus.kill()
                         cactus.is_alive = False
+                        # Remove the coin from the shed_characters dictionary using the sprite instance
+                        if cactus in player.shed_characters:
+                            player.shed_characters.pop(cactus)  # Use the sprite instance as the key
                 monster_laser = pygame.sprite.spritecollide(laser, monster, False)
                 if monster_laser:
                     monster_ex.rect.x += 10

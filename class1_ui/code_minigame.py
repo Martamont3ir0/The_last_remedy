@@ -12,18 +12,18 @@ class CodeEntryMiniGame:
         self.valid_codes = valid_codes
         self.input_text = ""  # The code being typed by the player
 
-        # Load the custom handwritten font (use the .ttf font file) for the riddle text
+        # Load the custom handwritten fonts (use the .ttf fonts file) for the riddle text
         try:
-            self.handwritten_font = pygame.font.Font("fonts/handwritten_font.ttf", 28)  # Slightly larger font
+            self.handwritten_font = pygame.font.Font("fonts/handwritten_font.ttf", 28)  # Slightly larger fonts
         except FileNotFoundError:
             print("Font file not found. Please make sure 'handwritten_font.ttf' is in the correct directory.")
-            self.handwritten_font = pygame.font.Font(None, 28)  # Default font in case the custom font is missing
+            self.handwritten_font = pygame.font.Font(None, 28)  # Default fonts in case the custom fonts is missing
         except Exception as e:
-            print(f"Error loading font: {e}")
-            self.handwritten_font = pygame.font.Font(None, 28)  # Default font in case of any error
+            print(f"Error loading fonts: {e}")
+            self.handwritten_font = pygame.font.Font(None, 28)  # Default fonts in case of any error
 
-        self.font = pygame.font.Font(None, 48)  # Main font for game text
-        self.small_font = pygame.font.Font(None, 32)  # Smaller font for UI text like feedback
+        self.font = pygame.font.Font(None, 48)  # Main fonts for game text
+        self.small_font = pygame.font.Font(None, 32)  # Smaller fonts for UI text like feedback
 
         # Input box settings
         self.box_width = 125
@@ -74,7 +74,7 @@ class CodeEntryMiniGame:
             notebook_y = screen.get_height() - self.notebook_image.get_height() - 10  # Position at the bottom
             screen.blit(self.notebook_image, (notebook_x, notebook_y))
 
-            # Display the riddle text on the notebook using the handwritten font
+            # Display the riddle text on the notebook using the handwritten fonts
             riddle_lines = [
                 "To solve this code, take note of these.",
                 "The best students’ numbers will put you at ease.",
@@ -100,7 +100,7 @@ class CodeEntryMiniGame:
                     self.active = True
                     self.input_text = ""  # Reset text on new activation
 
-            # Draw the input box using the default font
+            # Draw the input box using the default fonts
             pygame.draw.rect(screen, box_color, (self.box_x, self.box_y, self.box_width, self.box_height), 2)
             input_surface = self.font.render(self.input_text, True, (255, 255, 255))
             screen.blit(input_surface, (self.box_x + 10, self.box_y + 10))  # Display the text inside the box
@@ -129,7 +129,7 @@ class CodeEntryMiniGame:
                         if len(self.input_text) < 4:  # Limit input to 4 characters
                             self.input_text += chr(event.key)  # Add the number to the input text
 
-            # Display the "Enter Code" message with an outline using the default font
+            # Display the "Enter Code" message with an outline using the default fonts
             enter_code_text = "Enter Code"
             outline_color = (0, 0, 0)  # Black outline color
             text_color = (255, 255, 255)  # White text color
@@ -168,7 +168,7 @@ class CodeEntryMiniGame:
             # Render the actual feedback text
             screen.blit(feedback_surface, (feedback_x, feedback_y))
 
-            # If the puzzle is solved, show a success message using the default font
+            # If the puzzle is solved, show a success message using the default fonts
             if self.solved:
                 # Fill the screen with black to prepare for the success message
                 screen.fill((0, 0, 0))

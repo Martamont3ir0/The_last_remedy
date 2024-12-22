@@ -20,6 +20,7 @@ class Enemy(pygame.sprite.Sprite):
         self.speed = random.randint(1, 3)
         # setting the healthbar
         self.health = 10
+        self.spawn_frequency = 1
 
     def update(self, player):
 

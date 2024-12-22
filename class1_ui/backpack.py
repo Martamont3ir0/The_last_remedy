@@ -191,15 +191,15 @@ def backpack(screen, player,level_):
                                 player.use_laser = True
                                 return level
                             elif item.name == "Health Potion":
-                                health_potion = HealthRegeneration(0, 100 - player.health)  # Create health potion
-                                health_potion.apply(player)  # Apply health potion effect
+                                health_potion = HealthRegeneration(100 - player.health)  # Create health potion
+                                health_potion.affect_player(player,player.default_list)  # Apply health potion effect
                                 return level
                             elif item.name == "Grenade":
                                 player.weapon = "Grenade"  # Equip the grenade weapon
                                 return level
                             elif item.name == "Sadness Potion":
                                 sadness_potion = Sadness()
-                                sadness_potion.apply(player)
+                                sadness_potion.affect_player(player,player.default_list)
                                 return level
 
         # Drawing the backpack interface

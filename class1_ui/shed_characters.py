@@ -15,22 +15,6 @@ class Coin(pygame.sprite.Sprite):
         self.rect.y = random.randint(100, 515)
         self.is_alive = True
 
-        # Convert the coin's state to a dictionary for saving
-    def to_dict(self):
-        return {
-            'x': self.rect.x,
-            'y': self.rect.y,
-            'is_alive': self.is_alive
-        }
-
-    # Create a coin instance from a dictionary (for loading)
-    @classmethod
-    def from_dict(cls, data):
-        coin = cls()
-        coin.rect.x = data['x']
-        coin.rect.y = data['y']
-        coin.is_alive = data['is_alive']
-        return coin
 
 class Cactus(pygame.sprite.Sprite):
 
@@ -45,22 +29,6 @@ class Cactus(pygame.sprite.Sprite):
         self.rect.y = random.randint(100, 515)
         self.is_alive = True
 
-    # Convert the cactus's state to a dictionary for saving
-    def to_dict(self):
-        return {
-            'x': self.rect.x,
-            'y': self.rect.y,
-            'is_alive': self.is_alive
-        }
-
-    # Create a cactus instance from a dictionary (for loading)
-    @classmethod
-    def from_dict(cls, data):
-        cactus = cls()
-        cactus.rect.x = data['x']
-        cactus.rect.y = data['y']
-        cactus.is_alive = data['is_alive']
-        return cactus
 
 class Monster(pygame.sprite.Sprite):
 
@@ -77,15 +45,18 @@ class Monster(pygame.sprite.Sprite):
         self.speed = 0.51
         self.is_alive = True
 
-    def update(self,stop_pos):
+    def update(self,stop_pos,player):
 
         if self.is_alive:
             if self.rect.x > stop_pos[0]:
                 # Move the monster to the left
                 self.rect.x -= self.speed
+
             elif self.rect.x < stop_pos[0]:
                 self.rect.x = stop_pos[0]  # Snap to stop position if overshot
-
+        for key in player.shed_characters.keys():
+            if isinstance(key,Monster):
+                player.shed_characters[key] = (self.rect.x,self.rect.y)
     def kill_monster(self, stop_pos):
             self.is_alive = False  # Set the monster as not alive
             if stop_pos[0] < 600: #making sure the solanum will appear completely on the screen
@@ -100,21 +71,4 @@ class Monster(pygame.sprite.Sprite):
         """
 
         return self.rect.x - 720
-
-    # Convert the monster's state to a dictionary for saving
-    def to_dict(self):
-        return {
-            'x': self.rect.x,
-            'y': self.rect.y,
-            'is_alive': self.is_alive
-        }
-
-    # Create a monster instance from a dictionary (for loading)
-    @classmethod
-    def from_dict(cls, data):
-        monster = cls()
-        monster.rect.x = data['x']
-        monster.rect.y = data['y']
-        monster.is_alive = data['is_alive']
-        return monster
 

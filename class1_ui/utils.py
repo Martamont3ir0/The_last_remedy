@@ -31,7 +31,7 @@ def draw_buttons (screen, text, rect, font,base_color, text_color, hover_color, 
     -screen: pygame display surface
     -text: text to display on the button
     -rect:pygame.Rect object is to define button size and position
-    -font: font for text
+    -fonts: fonts for text
     -base color: color of button
     -text color: color of text
     -hover color: color of button when hovered over
@@ -83,7 +83,7 @@ def confirm_quit(screen):
     confirm_x= (width- confirm_width)//2
     confirm_y= (height-confirm_height)//2
 
-    #create the box and text font
+    #create the box and text fonts
     confirm_box= pygame.Rect(confirm_x, confirm_y, confirm_width, confirm_height)
     dialog_font= pygame.font.SysFont("bookantiqua", 32)
     button_font= pygame.font.SysFont("bookantiqua", 30)
@@ -182,7 +182,7 @@ def draw_slide(screen, slide, font, color, x,y, max_width, line_spacing):
     Parameters:
     - screen: pygame display surface
     - slide: list of strings to render
-    - font: pygame font object
+    - fonts: pygame fonts object
     - color: text color
     - x, y: starting position for the text
     - max_width: maximum width for text before wrapping (in pixels)
@@ -203,7 +203,7 @@ def draw_slide(screen, slide, font, color, x,y, max_width, line_spacing):
                 wrapped_line = test_line
             else:
                 # Render the current line and move to the next line
-                #rendered_line = font.render(wrapped_line, True, color)
+                #rendered_line = fonts.render(wrapped_line, True, color)
                 #screen.blit(rendered_line, (x, current_y))
                 #current_y += line_spacing
                 wrapped_lines.append(wrapped_line)
@@ -212,7 +212,7 @@ def draw_slide(screen, slide, font, color, x,y, max_width, line_spacing):
         # Render any remaining text in the line
         if wrapped_line:
             wrapped_lines.append(wrapped_line)
-            #rendered_line = font.render(wrapped_line, True, color)
+            #rendered_line = fonts.render(wrapped_line, True, color)
             #screen.blit(rendered_line, (x, current_y))
             #current_y += line_spacing
     #calculate the total height of the text block
