@@ -1,9 +1,9 @@
 import pygame
-
+from config import *
 class FinalChoice:
-    def __init__(self, screen, character_type):
+    def __init__(self, screen, player):
         self.screen = screen
-        self.character_type = character_type  # Character type: "girl" or "boy"
+        self.character_type = player.selected_character  # Character type: "girl" or "boy"
         self.font_title = pygame.font.Font(None, 80)  # Slightly larger, bolded title font
         self.font_options = pygame.font.Font(None, 48)  # Font for options
         self.font_subtext = pygame.font.Font(None, 40)  # Subtext font
@@ -110,6 +110,9 @@ class FinalChoice:
             outcome_x = self.screen.get_width() // 2 - outcome_surface.get_width() // 2
             outcome_y = self.screen.get_height() // 2 - outcome_surface.get_height() // 2
             self.render_text_with_shadow(outcome_text, self.font_outcome, outcome_x, outcome_y, (255, 255, 255))
+
+            # Apply brightness and sound settings dynamically
+            apply_brightness_and_sound(screen)
 
             pygame.display.flip()
 

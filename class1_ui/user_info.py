@@ -31,20 +31,25 @@ def user_info(player,screen,during_message):
         health_text = f"Health: {player.health}%"
         health_text = font2.render(health_text, True, deep_black)
         health_rect = health_text.get_rect()
-        health_rect.center = (90, 620)
+        health_rect.center = (90, 610)
         screen.blit(health_text, health_rect)
         money_text = f"Money: {player.money} coins"
         money_text = font2.render(money_text, True, deep_black)
         money_rect = health_text.get_rect()
-        money_rect.center = (90, 675)
+        money_rect.center = (90, 650)
         screen.blit(money_text, money_rect)
         weapon_text = f"Current weapon: {player.weapon}"
         weapon_text = font2.render(weapon_text, True, deep_black)
         weapon_rect = weapon_text.get_rect()
-        weapon_rect.center = (545, 620)
+        weapon_rect.topleft = (420, 610)
         screen.blit(weapon_text, weapon_rect)
         pup_text = f"Current PowerUp: {player.pup}"
         pup_text = font2.render(pup_text, True, deep_black)
         pup_rect = pup_text.get_rect()
-        pup_rect.center = (515, 675)
+        pup_rect.topleft = (420, 665)
         screen.blit(pup_text, pup_rect)
+        feelings = f"Status: Feeling {player.feelings}"
+        feelings = font2.render(feelings, True, deep_black)
+        feelings_rect = feelings.get_rect()
+        feelings_rect.topleft = (40, 680)
+        screen.blit(feelings, feelings_rect)

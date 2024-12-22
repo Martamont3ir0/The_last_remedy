@@ -3,29 +3,26 @@ from interactive_object import InteractiveObject
 
 
 class ElixirVessel(InteractiveObject):
-    def __init__(self, x, y):
-        # Define the activate method before calling the parent constructor
-        def activate():
-            """Check if the ingredients match the requirements to create the Elixir."""
-            if all(ingredient in self.inventory for ingredient in self.ingredients):
-                self.is_solved = True
-                print("Elixir created! The fate of humanity is now in your hands.")
-            else:
-                print("The Elixir is incomplete! Add the correct ingredients.")
-
-        # Path to the Elixir vessel image
-        image_path = "img/elixir_vessel.png"
+    def __init__(self):
 
         # Call the parent constructor with the activation method
-        super().__init__(x, y, image_path, activate, size=(332, 284))  # Resize the image
+        super().__init__(360,350,"img/elixir_vessel.png", self.activate, size=(332, 284))  # Resize the image
+
 
         # Puzzle state and ingredients
         self.is_solved = False
         self.ingredients = ["Solanum", "Elixir"]  # Correct ingredients for the Elixir
         self.inventory = []  # Store ingredients that the player has added
 
-        self.rect.x -= 50
-        self.rect.y = 200
+    # Define the activate method before calling the parent constructor
+    def activate(self):
+        """Check if the ingredients match the requirements to create the Elixir."""
+        if all(ingredient in self.inventory for ingredient in self.ingredients):
+            self.is_solved = True
+            print("Elixir created! The fate of humanity is now in your hands.")
+        else:
+            print("The Elixir is incomplete! Add the correct ingredients.")
+
 
     def add_ingredient(self, ingredient):
         """Allow the player to add an ingredient to the Elixir vessel."""

@@ -2,9 +2,10 @@ import pygame
 from final_choice import FinalChoice
 from game import *
 
+
 class ElixirMiniGame:
-    def __init__(self, background_path, character_type):
-        self.character_type = character_type
+    def __init__(self):
+
         self.background = pygame.image.load('img/vesselbackground.png')  # Load the background image for the elixir mini-game
         self.font = pygame.font.Font(None, 48)  # Font for displaying text
         self.to_do_font = pygame.font.Font(None, 36)  # Font for to-do list
@@ -16,13 +17,17 @@ class ElixirMiniGame:
             "Finally, add a meaningful tear (press M)."
         ]
         self.current_step = 0  # Start with the first step
-
-    def run(self, screen, clock, character_type):
+        self.note = False
+    def run(self, screen, clock,player):
+        font = pygame.font.Font(None, 26)
+        back_text = font.render("Return",True, glowing_light_red)
+        back_text_rect = back_text.get_rect()
+        back_text_rect.center = (30,30)
         running = True
         while running:
             screen.fill((0, 0, 0))  # Clear the screen before drawing
             screen.blit(self.background, (0, 0))  # Draw the elixir background
-
+            screen.blit(back_text, back_text_rect)
             # Display the current recipe steps as a to-do list at the bottom
             for i, step in enumerate(self.recipe_steps):
                 if i < self.current_step:
@@ -38,7 +43,11 @@ class ElixirMiniGame:
 
             # Display the recipe status on the screen (current step in the center)
             if self.current_step < len(self.recipe_steps):
-                step_text = self.font.render(self.recipe_steps[self.current_step], True, (255, 255, 255))
+                if not self.note:
+                    step_text = self.font.render(self.recipe_steps[self.current_step], True, (255, 255, 255))
+
+                elif self.note:
+                    step_text = self.font.render("You're too insensitive, get PowerUp.", True, (255, 255, 255))
                 screen.blit(step_text, (screen.get_width() // 2 - step_text.get_width() // 2, 50))
 
             for event in pygame.event.get():
@@ -57,9 +66,16 @@ class ElixirMiniGame:
                     elif event.key == pygame.K_w and self.current_step == 2:  # Water (W or w)
                         self.ingredients.append("Water")
                         self.current_step += 1
-                    elif event.key == pygame.K_m and self.current_step == 3:  # Meaningful Tear (M or m)
+                    elif event.key == pygame.K_m and self.current_step == 3 and player.feelings != "EXTRA Sad":
+                        self.note = True
+                    elif event.key == pygame.K_m and self.current_step == 3 and player.feelings == "EXTRA Sad":  # Meaningful Tear (M or m)
+                        self.note = False
                         self.ingredients.append("Meaningful Tear")
                         self.current_step += 1  # The recipe is complete
+
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
+                    if back_text_rect.collidepoint(event.pos):  # Check if return symbol is clicked to return
+                        return "level 3"
 
             # Update the display
             pygame.display.flip()
@@ -72,7 +88,7 @@ class ElixirMiniGame:
 
         # Call the final choice mini-game after completion
         # Pass the character_type (which should be determined beforehand) to FinalChoice
-        final_choice_screen = FinalChoice(screen, character_type)  # Now passing both arguments
+        final_choice_screen = FinalChoice(screen, player)  # Now passing both arguments
         final_choice_screen.display_choice_screen()
 
         return 'completed'  # Signal that the mini-game is finished

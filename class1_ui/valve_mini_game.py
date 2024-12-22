@@ -1,14 +1,16 @@
 import pygame
+from interactive_object import InteractiveObject
+from config import *
 
-
-class Valve:
+class Valve(InteractiveObject):
     def __init__(self, target_pressure):
+        super().__init__(100,280,'img/valve.png',True,(230,230))
         self.pressure = 50  # Starting pressure
         self.target_pressure = target_pressure
 
     def adjust_pressure(self, increase, amount):
         if increase:
-            self.pressure = min(self.pressure + amount, 100)
+            self.pressure = min(self.pressure + amount, 200)
         else:
             self.pressure = max(self.pressure - amount, 0)
 
@@ -90,7 +92,7 @@ class ValveMiniGame:
                 )
 
                 # Draw the pressure bar proportionate to the valve's pressure
-                red_bar_width = (self.valve.pressure / 100) * self.bar_width
+                red_bar_width = (self.valve.pressure / 200) * self.bar_width
                 pygame.draw.rect(screen, (255, 0, 0), (self.bar_x, self.bar_y, red_bar_width, self.bar_height))
 
             else:
@@ -111,11 +113,14 @@ class ValveMiniGame:
             # Event handling for quitting or exiting
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    running = False
+                    pygame.quit()
+                    exit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:  # Escape key to quit mini-game
                         running = False
 
+            # Apply brightness and sound settings dynamically
+            apply_brightness_and_sound(screen)
             pygame.display.flip()
             clock.tick(60)
 

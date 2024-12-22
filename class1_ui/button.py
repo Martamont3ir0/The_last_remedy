@@ -3,13 +3,10 @@ from interactive_object import InteractiveObject
 
 
 class Button(InteractiveObject):
-    def __init__(self, x, y):
-        # Adjust the x coordinate to move the button more to the left
-        x -= 70  # Example adjustment: move 50 pixels to the left
-        x -= 50
+    def __init__(self):
 
         image_path = "img/button.png"
-        super().__init__(x, y, image_path, self.activate, size=(100, 100))
+        super().__init__(600, 370, image_path, self.activate, size=(250, 300))
         self.code = ""
 
     def enter_code(self, digit):

@@ -1,4 +1,6 @@
 import pygame
+from matplotlib import interactive
+from user_info import *
 from player import Player
 from valve_mini_game import Valve
 from button import Button
@@ -7,11 +9,16 @@ from valve_mini_game import ValveMiniGame
 from code_minigame import CodeEntryMiniGame
 from elixir_minigame import ElixirMiniGame
 from final_choice import FinalChoice
-
+from start_message import *
 
 def run_level3(screen,player):
+    player.rect.x = 30
+    player.rect.y = 450
 
-    # Level 3: "The Elixir"
+    backpack_img = pygame.image.load("img/backpack.png")
+    backpack_img = pygame.transform.scale(backpack_img, (100, 100))
+    backpack_rect = backpack_img.get_rect(topleft=(600, 20))  # Create a rect for the backpack image
+
     level3_title = "Level 3: 'The Elixir'"
     level3_description = [
         "Objective: Use the Elixir to decide humanity's fate.",
@@ -25,21 +32,23 @@ def run_level3(screen,player):
 
     # Background for Level 3
     background = pygame.image.load("img/lab_background.jpg")
-    background = pygame.transform.scale(background, resolution)
+    background = pygame.transform.scale(background, (720,720))
 
     # Create player object
     if player is None:
         player = Player()
 
     # Create glowing puzzle objects
-    valve = Valve(150, 400)  # Adjusted with example values
-    button = Button(700, 400)  # Adjusted with example values
-    elixir_vessel = ElixirVessel(400, 400)  # Adjusted with example values
+    valve = Valve(150)  # Adjusted with example values
+    button = Button()  # Adjusted with example values
+    elixir_vessel = ElixirVessel()  # Adjusted with example values
 
     interactive_objects = pygame.sprite.Group(valve, button, elixir_vessel)
 
+
+
     # Start Level 3 music
-    pygame.mixer.music.load("audio/lab_alarm.wav")
+    pygame.mixer.music.load("audio/city alarm.wav")
     pygame.mixer.music.set_volume(0.1)
     pygame.mixer.music.play(-1)
 
@@ -49,19 +58,46 @@ def run_level3(screen,player):
     button_solved = False  # Flag for button mini-game
     valve_solved = False  # Flag for valve mini-game
 
+    running = True
+    # Start a timer
+    start_time = pygame.time.get_ticks()
+    while running and not player.seen_message3:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+        # Show level start message
+
+        show_start_message(screen, level3_title, level3_description, background, player)
+
+        if pygame.time.get_ticks() - start_time >= 1000:  # After 10 seconds, the loop of start message ends
+            running = False
+            player.seen_message3 = True
+
+
+        # Update the display (if needed)
+        pygame.display.flip()
+
     # Main game loop
     running = True
     while running:
+
+
 
         dt = pygame.time.get_ticks() % 1000
 
         # Get the player's key states
         player_keys = pygame.key.get_pressed()
 
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
+
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
+                if backpack_rect.collidepoint(event.pos):# Check if backpack is clicked
+                    return "backpack"#Enter the backpack
 
             # Handling user input for puzzles
             if event.type == pygame.KEYDOWN:
@@ -105,13 +141,13 @@ def run_level3(screen,player):
         if pygame.key.get_pressed()[pygame.K_e]:  # If the "E" key is pressed
             if elixir_vessel.is_near(player.rect, proximity=50):  # Check if player is near the elixir vessel
                 if button_solved and valve_solved:  # Both mini-games must be solved to unlock the final mini-game
-                    elixir_mini_game = ElixirMiniGame("img/vesselbackground.png",selected_character)
-                    result = elixir_mini_game.run(screen, pygame.time.Clock())
+                    elixir_mini_game = ElixirMiniGame()
+                    result = elixir_mini_game.run(screen, pygame.time.Clock(),player)
                     if result == "completed":
                         print("Elixir mini-game completed! Level finished!")
                         running = False  # End the level once Elixir mini-game is completed
                         # Trigger the FinalChoice screen
-                        final_choice_screen = FinalChoice(screen, player_character_image)
+                        final_choice_screen = FinalChoice(screen,player)
                         chosen_option = final_choice_screen.display_choice_screen()
 
                         # Show the outcome based on the player's choice
@@ -164,7 +200,8 @@ def run_level3(screen,player):
         # Update screen
         screen.fill((0, 0, 0))
         screen.blit(background, (0, 0))
-
+        # Show backpack on a specific position
+        screen.blit(backpack_img, backpack_rect.topleft)  # Blit the image at the top-left of the rect
         # Draw puzzle objects
         valve.draw(screen)
         button.draw(screen)
@@ -173,24 +210,28 @@ def run_level3(screen,player):
         # Draw interaction prompts and highlight logic
         for obj in interactive_objects:
             is_highlighted = False
-            if obj.is_near(player.rect, proximity=50):
+            if obj.is_near(player.rect, proximity=40):
                 is_highlighted = True
                 font = pygame.font.Font(None, 36)
                 interaction_prompt = font.render("Press E to interact", True, (255, 255, 255))
                 obj.draw(screen, highlight=is_highlighted)
 
         # Draw the player
-        player.update()
+        player.update(1)
         screen.blit(player.image, player.rect)
+        user_info(player, screen, False)
+        # Apply brightness and sound settings dynamically
+        apply_brightness_and_sound(screen)
 
         # Update the display
         pygame.display.flip()
 
         # Frame rate control
         pygame.time.delay(30)
+
     return player.selected_character  # Return the character type (either "girl" or "boy")
     pygame.mixer.music.stop()
-    print("Level 3 setup complete!")
+
     return "end_game"
 
 

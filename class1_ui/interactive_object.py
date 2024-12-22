@@ -25,7 +25,7 @@ class InteractiveObject(pygame.sprite.Sprite):
         if self.activate_func:
             self.activate_func()
 
-    def is_near(self, player_rect, proximity=40):
+    def is_near(self, player_rect, proximity):
         """Check if the player is within a certain distance (proximity)."""
         # Calculate Euclidean distance between object and player
         dx = self.rect.centerx - player_rect.centerx

@@ -62,11 +62,11 @@ def shop_window(screen,player):
     # Define items available in the shop
     shop_items = [
         {"name": "Sunglasses", "value": 10, "image_path": "img/glasses.png"},
-        {"name": "Laser", "value": 50, "image_path": "img/laser.png"},
-        {"name": "Health Potion", "value": 25, "image_path": "img/health_potion.png"},
+        {"name": "Laser", "value": 20, "image_path": "img/laser.png"},
+        {"name": "Health Potion", "value": 30, "image_path": "img/health_potion.png"},
         {"name": "Grenade", "value": 100, "image_path": "img/grenade.png"},
-        {"name": "Airplane", "value": 9800, "image_path": ""},
-        {"name": "Ship", "value": 11340, "image_path": ""}
+        {"name": "Sadness Potion", "value": 200, "image_path": "img/sadpotion.png"},
+        {"name": "Airplane", "value": 11340, "image_path": ""}
     ]
     bg_shop = pygame.image.load("img/shop.png")
     running = True
@@ -134,7 +134,11 @@ def shop_window(screen,player):
                 if return_symbol_rect.collidepoint(event.pos):  # Check if return symbol is clicked to return
                     return "backpack"
 
-def backpack(screen, player):
+def backpack(screen, player,level_):
+    if level_ == 2:
+        level = "shed"
+    elif level_ == 3:
+        level = "level3"
 
     # Configuration for items in the backpack
     item_configs = {
@@ -143,6 +147,7 @@ def backpack(screen, player):
         "Laser": (180, 140, (280, 200)),
         "Health Potion": (130, 130, (550, 210)),
         "Grenade": (110, 170, (580, 370)),
+        "Sadness Potion": (140,140,(300,400))
     }
 
     while True:
@@ -157,7 +162,7 @@ def backpack(screen, player):
                     return "shop"
                 # Check if the return symbol is clicked
                 elif return_symbol_rect.collidepoint(event.pos):
-                    return "shed"
+                    return level
 
                 # Check for item clicks in the backpack
                 for item in backpack_chest.items:
@@ -177,21 +182,25 @@ def backpack(screen, player):
                             if item.name == "Sunglasses":
                                 player.glasses_used = True
                                 backpack_chest.remove_item(item)  # Remove glasses from the backpack since they were not removed above
-                                return "shed"
+                                return level
                             elif item.name == "Map" and player.glasses_used:
                                 player.map_used = True
-                                return "shed"
+                                return level
                             elif item.name == "Laser":
                                 player.weapon = "Laser"  # Equip the laser weapon
                                 player.use_laser = True
-                                return "shed"
+                                return level
                             elif item.name == "Health Potion":
                                 health_potion = HealthRegeneration(0, 100 - player.health)  # Create health potion
                                 health_potion.apply(player)  # Apply health potion effect
-                                return "shed"
+                                return level
                             elif item.name == "Grenade":
                                 player.weapon = "Grenade"  # Equip the grenade weapon
-                                return "shed"
+                                return level
+                            elif item.name == "Sadness Potion":
+                                sadness_potion = Sadness()
+                                sadness_potion.apply(player)
+                                return level
 
         # Drawing the backpack interface
         screen.blit(bg_backpack, (0, 0))  # Draw the background

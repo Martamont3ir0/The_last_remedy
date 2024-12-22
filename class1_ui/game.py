@@ -10,6 +10,7 @@ from death import death
 from user_info import *
 from surprise_pup import Surprise
 from level3 import *
+from backpack import *
 def character_selection_screen():
     # Screen setup
     screen = pygame.display.set_mode(resolution)
@@ -143,20 +144,23 @@ def game_loop(interface_callback):
 
     while True:
         if current_state == "main":
+            player.level = 1
             current_state = execute_game(player, interface_callback)
         elif current_state == "puzzle_message":
             current_state = puzzle_message(background, player)
         elif current_state == "puzzle_game":
             current_state = puzzle_game(screen)
         elif current_state == "shed":
+            player.level = 2
             current_state = shed(player)
         elif current_state == "backpack":
-            current_state = backpack(screen, player)
+            current_state = backpack(screen, player,player.level)
         elif current_state == "shop":
             current_state = shop_window(screen, player)
         elif current_state == "death":
             current_state = death(interface_callback)
         elif current_state == "level3":
+            player.level = 3
             current_state = run_level3(screen,player)
 
         # applying brightness and sound settings in each loop iteration

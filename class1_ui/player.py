@@ -48,11 +48,14 @@ class Player(pygame.sprite.Sprite):
         self.glasses_used = False  # to check if glasses were used and light can be turned off
 
         #level 2 handles
-        self.seen_message = False
+        self.seen_message2 = False
         self.monster = []
         self.coins_group = []
         self.cactus_group = []
 
+        #level 3 handles
+        self.feelings = "Happy"
+        self.seen_message3 = False
     def save_positions(self):
         positions = {
             'coins': [(coin.rect.x, coin.rect.y) for coin in coin_group],

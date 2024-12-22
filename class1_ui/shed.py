@@ -77,7 +77,7 @@ def shed(player):
     # Main loop
     running = True
 
-    while running and not player.seen_message:
+    while running and not player.seen_message2:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -88,7 +88,7 @@ def shed(player):
 
         if pygame.time.get_ticks() - start_time >= 1000:  # After 10 seconds, the loop of start message ends
             running = False
-            player.seen_message = True
+            player.seen_message2 = True
 
         # Update the display (if needed)
         pygame.display.flip()

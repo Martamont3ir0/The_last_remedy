@@ -1,5 +1,5 @@
 import pygame
-
+from config import *
 
 class CodeEntryMiniGame:
     def __init__(self, background_path, notebook_image_path, valid_codes):
@@ -76,7 +76,7 @@ class CodeEntryMiniGame:
 
             # Display the riddle text on the notebook using the handwritten font
             riddle_lines = [
-                "To solve this code, take note of these,",
+                "To solve this code, take note of these.",
                 "The best students’ numbers will put you at ease.",
                 "Insert them in order, don’t you deprive,",
                 "Only then will you manage to survive.",
@@ -198,6 +198,8 @@ class CodeEntryMiniGame:
                 pygame.display.flip()
                 pygame.time.wait(2000)  # Wait for 2 seconds before restarting the game
 
+            # Apply brightness and sound settings dynamically
+            apply_brightness_and_sound(screen)
             # Update the screen
             pygame.display.flip()
             clock.tick(60)
