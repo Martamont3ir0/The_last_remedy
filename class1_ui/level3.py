@@ -11,7 +11,7 @@ from elixir_minigame import ElixirMiniGame
 from final_choice import FinalChoice
 from start_message import *
 
-def run_level3(screen,player):
+def run_level3(screen,player,interface_callback):
     player.rect.x = 30
     player.rect.y = 450
 
@@ -156,7 +156,7 @@ def run_level3(screen,player):
                         chosen_option = final_choice_screen.display_choice_screen()
 
                         # Show the outcome based on the player's choice
-                        final_choice_screen.display_outcome_screen(chosen_option)
+                        final_choice_screen.display_outcome_screen(chosen_option,interface_callback)
 
                 else:
                     # Display a warning that other tasks must be completed first

@@ -87,33 +87,19 @@ def character_selection_screen():
 
     return selected_character,character_image_path  # Return the image path, not just the character name
 
-
-def game_loop(interface_callback, player, current_state):
-    """
-    The main game loop that handles the different game states and transitions.
-    It starts with character selection, then progresses through various levels
-    and game states such as puzzles, shops, and more. Each state transition is
-    handled by executing specific functions based on the current state.
-
-    The function also manages background music, timer events, and the overall game flow.
-
-    :param interface_callback: A callback function for the game interface.
-    :param player: The player object which holds the player's data and state.
-    :param current_state: The current game state, used to determine the next state.
-    :return: None
-    """
-
-    # Character selection screen
-    selected_character, character_image_path = character_selection_screen()  # Returns the selected character and its image path
+def game_loop(interface_callback,player,current_state):
+    # Character selection
+    selected_character,character_image_path = character_selection_screen()  # Returns image path
 
     # SETUP:
-    # Load the background image for the level
-    background = pygame.image.load("img/backroundscenario.jpg")  # Ensure the correct image path is used
+    # Load the background image
+    background = pygame.image.load("img/backroundscenario.jpg")  # Make sure this path is correct
 
-    # Create the player with the selected character and image path
-    player.set_character(selected_character, character_image_path)
 
-    # Show the start message after character selection
+    # Create the player with the selected image path
+
+    player.set_character(selected_character,character_image_path)
+    # Show start message after character selection
     level1_title = "Level 1: 'The Map'"
     level1_description = [
         "Objective: Find the map that reveals the location of Solanum in the Wastes.",
@@ -122,71 +108,67 @@ def game_loop(interface_callback, player, current_state):
         "Note: GRAVITY DOESN’T EXIST IN THIS PLACE, so you’ll be floating as you navigate."
     ]
 
-    # Stop any background interface music from playing
+    #Stop background interface music
     pygame.mixer.music.stop()
 
-    # Initialize the screen for the game
     screen = pygame.display.set_mode(resolution)
-
-    # Show level start message on the screen
+    #Show level start message
     show_start_message(screen, level1_title, level1_description, background, player)
 
-    # Load and play city alarm music
-    pygame.mixer.music.load("audio/city alarm.wav")
-    pygame.mixer.music.set_volume(0.1)  # Set the volume to 10%
-    pygame.mixer.music.play(-1)  # Play the music in a loop
 
-    # Start a timer for the level's start message
+    # add city alarm music
+    pygame.mixer.music.load("audio/city alarm.wav")
+    # Set the volume (0.0 to 1.0)
+    pygame.mixer.music.set_volume(0.1)  # Sets the volume to 10%
+
+    # Start a timer
     start_time = pygame.time.get_ticks()
 
-    # Main loop for displaying the start message
+    # Main loop
     running = True
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
                 pygame.quit()
 
-        # After 10 seconds, end the start message and move to the next state
-        if pygame.time.get_ticks() - start_time >= 10000:
+        if pygame.time.get_ticks() - start_time >= 10000: #After 10 seconds, the loop of start message ends
             running = False
 
-        # Update the display
+
+        # Update the display (if needed)
         pygame.display.flip()
-        pygame.time.delay(30)  # Delay to reduce CPU usage
+        pygame.time.delay(30) #delay to reduce resource usage
 
-    # Once the start message finishes, continue the game with the next states
+    pygame.mixer.music.play(-1)  # Start playing  in a loop
 
-    # Main game loop
+
     while True:
-        player.current_state = current_state  # Update the player's current state
-        print(player.current_state)  # Debugging purpose: Print current state
-
-        # Transition between game states based on the current state
+        player.current_state = current_state
+        print(player.current_state)
         if current_state == "main":
             player.level = 1
-            current_state = execute_game(player, interface_callback)  # Main game state logic
+            current_state = execute_game(player, interface_callback)
         elif current_state == "puzzle_message":
-            current_state = puzzle_message(background, player)  # Show the puzzle message
+            current_state = puzzle_message(background, player)
         elif current_state == "puzzle_game":
-            current_state = puzzle_game(screen)  # Start the puzzle game
+            current_state = puzzle_game(screen)
         elif current_state == "shed":
             player.level = 2
-            current_state = shed(player)  # Transition to the shed state
+            current_state = shed(player)
         elif current_state == "backpack":
-            current_state = backpack(screen, player, player.level)  # Access the backpack
+            current_state = backpack(screen, player,player.level)
         elif current_state == "shop":
-            current_state = shop_window(screen, player)  # Open the shop window
+            current_state = shop_window(screen, player)
         elif current_state == "death":
-            current_state = death(interface_callback, player)  # Handle player death
+            current_state = death(interface_callback,player)
         elif current_state == "level3":
             player.level = 3
-            current_state = run_level3(screen, player)  # Transition to level 3
+            current_state = run_level3(screen,player,interface_callback)
 
-        # Apply brightness and sound settings dynamically in each loop iteration
+        # applying brightness and sound settings in each loop iteration
         apply_brightness_and_sound(screen)
-
-        # Update the display with the changes
         pygame.display.flip()
 
 
@@ -303,7 +285,8 @@ def execute_game(player, interface_callback=None):
         if enemy_cooldown <= 0:
             enemy = Enemy()
             enemies.add(enemy)
-            enemy_cooldown = fps * enemy.spawn_frequency  # Cooldown reset
+            enemy_cooldown = fps * enemy.spawn_frequency # Cooldown reset
+
         enemy_cooldown -= 1
 
         # Update all groups
@@ -356,7 +339,7 @@ def execute_game(player, interface_callback=None):
         if powerup is not None:
             # Check for collision with surprise
             if pygame.sprite.spritecollide(player, surprise, True):
-                powerup.affect_player(player,enemies)  # Apply the power-up
+                powerup.affect_player(player,enemy)  # Apply the power-up
                 # Only apply the power-up if it hasn't been used yet
                 if pup_count == 0:
                     pup_count +=1
@@ -384,6 +367,8 @@ def execute_game(player, interface_callback=None):
         if player.health <= 0:
             player.health = 100
             return "death"
+        if player.rect.x >= 10:
+            return "shed"
 
 
         # Apply brightness and sound settings dynamically

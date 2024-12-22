@@ -243,7 +243,7 @@ def shed(player):
 
             collided_coins = pygame.sprite.spritecollide(player, coins_group, False)
             if collided_coins:
-                player.money += 35
+                player.money += 50
                 for coin in collided_coins:
                     coin.is_alive = False
                     coin.kill()
