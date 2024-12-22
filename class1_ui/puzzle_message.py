@@ -4,6 +4,7 @@ from config import *
 from shed import *
 import random # For shuffling nodes
 from class1_ui.interface import interface
+from utils import *
 
 def puzzle_game(screen):
     """
@@ -224,6 +225,11 @@ def puzzle_message(background, player):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
+
+            key = pygame.key.get_pressed()
+            # 'P' logic for saving
+            if key[pygame.K_p]:
+                save_game(player, player.state)
 
         # Update the balloon's position
         if balloon_rect.centery < balloon_end_y: #Controlling when the y of balloon rect reaches the y position we want

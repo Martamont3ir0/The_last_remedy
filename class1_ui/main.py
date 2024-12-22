@@ -1,5 +1,5 @@
-# if I want to test my code, run this file
-from interface import interface
+from interface import *
+
 
 def main():
     interface()

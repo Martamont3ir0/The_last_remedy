@@ -101,16 +101,22 @@ def shed(player):
     # Main loop
     running = True
 
+
     while running and not player.seen_message2:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
+
+            key = pygame.key.get_pressed()
+            # 'P' logic for saving
+            if key[pygame.K_p]:
+                save_game(player, player.state)
         # Show level start message
 
         show_start_message(screen, level2_title, level2_description, background,player)
 
-        if pygame.time.get_ticks() - start_time >= 1000:  # After 10 seconds, the loop of start message ends
+        if pygame.time.get_ticks() - start_time >= 10000:  # After 10 seconds, the loop of start message ends
             running = False
             player.seen_message2 = True
 
@@ -133,6 +139,11 @@ def shed(player):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
+
+            key = pygame.key.get_pressed()
+            # 'P' logic for saving
+            if key[pygame.K_p]:
+                save_game(player, player.state)
 
         # Check for mouse button down event
 
@@ -207,7 +218,7 @@ def shed(player):
             if monster_ex.distance() >= 0: #the monster is not yet in the screen
                 warning_text = f"Something in a {monster_ex.distance()} meters radar approaching..."
 
-            if monster_ex.rect.x == 900: #monster is near the screen
+            if monster_ex.rect.x <= 900: #monster is near the screen
                 pygame.mixer.music.stop()
                 pygame.mixer.music.load("audio/monster.mp3")
                 pygame.mixer.music.play(-1)  # Start playing  in a loop
@@ -221,7 +232,7 @@ def shed(player):
 
             collided_cactus = pygame.sprite.spritecollide(player, cactus_group, False)
             if collided_cactus:
-                player.take_damage(10, False)
+                player.take_damage(15, False)
                 for cactus in collided_cactus:
                     cactus.kill()
                     # Remove the coin from the shed_characters dictionary using the sprite instance
@@ -232,7 +243,7 @@ def shed(player):
 
             collided_coins = pygame.sprite.spritecollide(player, coins_group, False)
             if collided_coins:
-                player.money += 30
+                player.money += 35
                 for coin in collided_coins:
                     coin.is_alive = False
                     coin.kill()

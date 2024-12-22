@@ -3,7 +3,7 @@ from config import *
 from utils import *
 
 
-def death(interface_callback):
+def death(interface_callback,player):
     """
     Player dies and screen resembles a death view.
 
@@ -68,7 +68,10 @@ def death(interface_callback):
                         pygame.quit()
                         exit()
 
-
+        key = pygame.key.get_pressed()
+        # 'P' logic for saving
+        if key[pygame.K_p]:
+            save_game(player, player.state)
         #drawing background, title and description
         screen.blit(death_bg, (0,0))
         screen.blit(message_title, message_rect)

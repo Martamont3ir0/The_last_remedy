@@ -20,10 +20,10 @@ def run_level3(screen,player):
     backpack_rect = backpack_img.get_rect(topleft=(600, 20))  # Create a rect for the backpack image
 
     level3_title = "Level 3: 'The Elixir'"
-    level3_description = [
+    level3_description = ["This is the last mission."
         "Objective: Use the Elixir to decide humanity's fate.",
-        "Setting: A ruined underground lab once belonging to The Last Dawn.",
         "Key Challenge: Fix the lab’s machinery to combine the Solanum with the Elixir.",
+                          "Note: Be curious and remember who are the best students at NOVA IMS"
     ]
 
     # Stop background music from previous levels
@@ -70,7 +70,7 @@ def run_level3(screen,player):
 
         show_start_message(screen, level3_title, level3_description, background, player)
 
-        if pygame.time.get_ticks() - start_time >= 1000:  # After 10 seconds, the loop of start message ends
+        if pygame.time.get_ticks() - start_time >= 10000:  # After 10 seconds, the loop of start message ends
             running = False
             player.seen_message3 = True
 
@@ -94,6 +94,11 @@ def run_level3(screen,player):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
+
+
+            # 'P' logic for saving
+            if player_keys[pygame.K_p]:
+                save_game(player, player.state)
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
                 if backpack_rect.collidepoint(event.pos):# Check if backpack is clicked

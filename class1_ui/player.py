@@ -14,12 +14,12 @@ shake_intensity = 1  # Maximum pixels to shake
 
 # making Player a child of the Sprite class
 class Player(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self,health, money, state, character,type):
         super().__init__()
 
         # VISUAL VARIABLES
-        self.selected_character = "Girl" #as default character before its chosen
-        self.character_image_path = "img/female-removebg-preview.png" #as default character before its chosen
+        self.selected_character = type
+        self.character_image_path = character
         self.image = pygame.image.load(self.character_image_path)
         self.image = pygame.transform.scale(self.image, (55, 100))
         self.rect = self.image.get_rect()
@@ -34,13 +34,15 @@ class Player(pygame.sprite.Sprite):
 
         # GAMEPLAY VARIABLES
         self.speed = 5
-        self.health = 100
+        self.health = health
         self.bullet_cooldown = 0
         self.is_invincible = False
-        self.money = 200
+        self.money = money
         self.weapon = "Default Bullets"
         self.pup = None
         self.level = None
+        self.state = state
+
         # NEW: Store background dimensions
         self.bg_width = 720
         self.bg_height = 550
@@ -169,11 +171,4 @@ class Player(pygame.sprite.Sprite):
 
         if self.bullet_cooldown>0:
             self.bullet_cooldown-=1
-
-
-
-
-
-
-
 

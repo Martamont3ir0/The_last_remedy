@@ -4,8 +4,44 @@ Functions that are generic and modular.
 """
 
 import pygame
-
+import json
 from config import *
+
+
+
+def save_game(player, current_state):
+    """
+    Save the game state to a JSON file.
+    Args:
+        player (Player): The player object.
+        current_state (str): The current level identifier.
+    """
+    save_data = {
+        "health": player.health,
+        "money": player.money,
+        "state": player.state,
+        "character": player.character_image_path,
+        "type": player.selected_character
+    }
+    with open("savegame.json", "w") as save_file:
+        json.dump(save_data, save_file)
+    print("Game saved!")
+
+
+def load_game():
+    """
+    Load the game state from a JSON file.
+    Returns:
+        dict: The loaded game state.
+    """
+    try:
+        with open("savegame.json", "r") as save_file:
+            save_data = json.load(save_file)
+        print("Game loaded! Well done")
+        return save_data
+    except FileNotFoundError:
+        print("No save file found!")
+        return None
 
 def draw_slider(screen, rect, value, max_value, base_color, fill_color):
     """

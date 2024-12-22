@@ -11,6 +11,8 @@ from user_info import *
 from surprise_pup import Surprise
 from level3 import *
 from backpack import *
+from utils import *
+
 def character_selection_screen():
     # Screen setup
     screen = pygame.display.set_mode(resolution)
@@ -75,6 +77,8 @@ def character_selection_screen():
                     selected_character = "boy"  # Set to "boy"
                     character_image_path = "img/male-removebg-preview__1_-removebg-preview.png"  # Store the image path
 
+
+
         # Apply brightness and sound settings dynamically
         apply_brightness_and_sound(screen)
 
@@ -83,11 +87,9 @@ def character_selection_screen():
 
     return selected_character,character_image_path  # Return the image path, not just the character name
 
-def game_loop(interface_callback):
+def game_loop(interface_callback,player,current_state):
     # Character selection
     selected_character,character_image_path = character_selection_screen()  # Returns image path
-
-
 
     # SETUP:
     # Load the background image
@@ -95,7 +97,7 @@ def game_loop(interface_callback):
 
 
     # Create the player with the selected image path
-    player = Player()  # Pass image path directly
+
     player.set_character(selected_character,character_image_path)
     # Show start message after character selection
     level1_title = "Level 1: 'The Map'"
@@ -131,7 +133,7 @@ def game_loop(interface_callback):
                 running = False
                 pygame.quit()
 
-        if pygame.time.get_ticks() - start_time >= 1000: #After 10 seconds, the loop of start message ends
+        if pygame.time.get_ticks() - start_time >= 10000: #After 10 seconds, the loop of start message ends
             running = False
 
 
@@ -140,9 +142,11 @@ def game_loop(interface_callback):
         pygame.time.delay(30) #delay to reduce resource usage
 
     pygame.mixer.music.play(-1)  # Start playing  in a loop
-    current_state = "main"  # Start in the main area
+
 
     while True:
+        player.current_state = current_state
+        print(player.current_state)
         if current_state == "main":
             player.level = 1
             current_state = execute_game(player, interface_callback)
@@ -158,7 +162,7 @@ def game_loop(interface_callback):
         elif current_state == "shop":
             current_state = shop_window(screen, player)
         elif current_state == "death":
-            current_state = death(interface_callback)
+            current_state = death(interface_callback,player)
         elif current_state == "level3":
             player.level = 3
             current_state = run_level3(screen,player)
@@ -174,9 +178,6 @@ def execute_game(player, interface_callback=None):
     # Setting up the background
     background = pygame.image.load("img/backroundscenario.jpg")
 
-    # Create the player with the selected character image
-    if player is None:
-        player = Player()
     player.level = 1
     # Screen setup
     clock = pygame.time.Clock()
@@ -208,6 +209,7 @@ def execute_game(player, interface_callback=None):
     start_time_pup = 3000000 #so it doesn't stop before the collision
     running = True
     pup_count =  0
+
     # Initialize powerup to None
     powerup = None
     while running:
@@ -218,7 +220,10 @@ def execute_game(player, interface_callback=None):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
-
+        key = pygame.key.get_pressed()
+        # 'P' logic for saving
+        if key[pygame.K_p]:
+            save_game(player, player.state)
 
         # Calculate remaining time
         elapsed_time = time.time() - start_time
@@ -362,10 +367,6 @@ def execute_game(player, interface_callback=None):
             player.health = 100
             return "death"
 
-        # Check if the player reaches the right edge
-        if player.rect.right >= width:
-            pygame.mixer.music.stop()
-            return "level3"
 
         # Apply brightness and sound settings dynamically
         apply_brightness_and_sound(screen)

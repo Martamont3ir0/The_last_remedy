@@ -2,12 +2,13 @@ import pygame
 import cv2
 
 class FinalChoice:
-    def __init__(self, screen, player):
+    def _init_(self, screen, player):
         self.screen = screen
         self.character_type = player.selected_character  # Character type: "girl" or "boy"
         self.font_title = pygame.font.Font(None, 80)
         self.font_options = pygame.font.Font(None, 48)
         self.font_subtext = pygame.font.Font(None, 40)
+        self.font_discreet = pygame.font.Font(None, 32)  # Smaller font for discreet messages
         self.font_outcome = pygame.font.Font(None, 60)
         self.options = [
             "Option 1: Save humanity",
@@ -86,6 +87,10 @@ class FinalChoice:
 
     def display_choice_screen(self):
         running = True
+        press_twice_text = "Press Enter twice for good measure"
+        show_press_twice = True
+        press_twice_last_toggled = pygame.time.get_ticks()
+
         while running:
             self.screen.fill((0, 0, 0))  # Clear the screen with black background
 
@@ -99,6 +104,18 @@ class FinalChoice:
             subtext_x = self.screen.get_width() // 2 - subtext_surface.get_width() // 2
             subtext_y = 130
             self.render_text_with_shadow(subtext, self.font_subtext, subtext_x, subtext_y, (200, 200, 200))
+
+            # Flash "Press Twice" Text
+            current_time = pygame.time.get_ticks()
+            if current_time - press_twice_last_toggled > 500:
+                show_press_twice = not show_press_twice
+                press_twice_last_toggled = current_time
+
+            if show_press_twice:
+                press_twice_surface = self.font_discreet.render(press_twice_text, True, (150, 150, 150))
+                press_twice_x = self.screen.get_width() // 2 - press_twice_surface.get_width() // 2
+                press_twice_y = self.screen.get_height() - 50
+                self.screen.blit(press_twice_surface, (press_twice_x, press_twice_y))
 
             # Render the options
             for i, option in enumerate(self.options):
@@ -135,17 +152,34 @@ class FinalChoice:
         self.screen.fill((0, 0, 0))  # Fill screen with black before displaying video
         pygame.display.flip()  # Update screen to show black before video
         self.play_video(choice_index)
+        self.display_final_end_screen()
 
+    def display_final_end_screen(self):
+        """Show the final end screen with an appealing effect."""
+        gradient_surface = pygame.Surface(self.screen.get_size())
+        for i in range(self.screen.get_height()):
+            color = (i * 255 // self.screen.get_height(), 0, 255 - i * 255 // self.screen.get_height())
+            pygame.draw.line(gradient_surface, color, (0, i), (self.screen.get_width(), i))
 
+        fade_surface = pygame.Surface(self.screen.get_size())
+        fade_surface.fill((0, 0, 0))
 
+        clock = pygame.time.Clock()
+        for alpha in range(0, 256, 5):  # Gradual fade in
+            fade_surface.set_alpha(255 - alpha)
+            self.screen.blit(gradient_surface, (0, 0))
+            self.screen.blit(fade_surface, (0, 0))
 
+            text = "Thank You for Playing"
+            pulsate_size = 60 + (10 * pygame.time.get_ticks() % 1000 // 500)
+            font = pygame.font.Font(None, pulsate_size)
+            text_surface = font.render(text, True, (255, 255, 255))
+            text_rect = text_surface.get_rect(center=(self.screen.get_width() // 2, self.screen.get_height() // 2))
+            self.screen.blit(text_surface, text_rect)
 
+            pygame.display.flip()
+            clock.tick(30)
 
-
-
-
-
-
-
-
+        pygame.time.wait(3000)  # Hold the final screen for 3 seconds
+        return "interface"
 
