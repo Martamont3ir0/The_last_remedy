@@ -267,6 +267,18 @@ def draw_slide(screen, slide, font, color, x,y, max_width, line_spacing):
 
 # glowing affect and shadow affect on title
 def glowing_title(screen, title_font, text, position, text_color, glow_color,shadow_color):
+    """
+        Renders a glowing title with a shadow effect on the specified screen.
+
+        Args:
+            screen (Surface): The Pygame surface to draw the title on.
+            title_font (Font): The font used to render the title text.
+            text (str): The title text to be displayed.
+            position (tuple): The (x, y) coordinates for the center of the title.
+            text_color (tuple): The color of the title text (RGB).
+            glow_color (tuple): The color of the glow effect (RGB).
+            shadow_color (tuple): The color of the shadow effect (RGB).
+        """
     shadow_offset= 4
     shadow_surface= title_font.render(text, True, shadow_color)
     shadow_rect= shadow_surface.get_rect(center=(position[0]+shadow_offset,position[1]+shadow_offset))
@@ -296,6 +308,14 @@ def glowing_title(screen, title_font, text, position, text_color, glow_color,sha
 
 # Function to draw a stick figure with a construction hat
 def draw_stick_figure_with_hat(screen, x, y):
+    """
+        Draws a stick figure with a construction hat on the specified screen.
+
+        Args:
+            screen (Surface): The Pygame surface to draw the stick figure on.
+            x (int): The x-coordinate for the center of the stick figure.
+            y (int): The y-coordinate for the center of the stick figure.
+        """
     # head
     pygame.draw.circle(screen, (255, 255, 255), (x, y), 20, 2)  # White head outline
 
@@ -320,6 +340,14 @@ def draw_stick_figure_with_hat(screen, x, y):
 
 # Function to draw a normal stick figure (without a hat)
 def draw_normal_stick_figure(screen, x, y):
+    """
+        Draws a normal stick figure (without a hat) on the specified screen.
+
+        Args:
+            screen (Surface): The Pygame surface to draw the stick figure on.
+            x (int): The x-coordinate for the center of the stick figure.
+            y (int): The y-coordinate for the center of the stick figure.
+        """
     # head
     pygame.draw.circle(screen, (255, 255, 255), (x, y), 20, 2)  # White head outline
 
