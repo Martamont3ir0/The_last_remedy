@@ -148,13 +148,13 @@ class FinalChoice:
 
         return self.selected_index
 
-    def display_outcome_screen(self, choice_index):
+    def display_outcome_screen(self, choice_index,interface_callback):
         self.screen.fill((0, 0, 0))  # Fill screen with black before displaying video
         pygame.display.flip()  # Update screen to show black before video
         self.play_video(choice_index)
-        self.display_final_end_screen()
+        self.display_final_end_screen(interface_callback)
 
-    def display_final_end_screen(self):
+    def display_final_end_screen(self,interface_callback):
         """Show the final end screen with an appealing effect."""
         gradient_surface = pygame.Surface(self.screen.get_size())
         for i in range(self.screen.get_height()):
@@ -181,5 +181,5 @@ class FinalChoice:
             clock.tick(30)
 
         pygame.time.wait(3000)  # Hold the final screen for 3 seconds
-        return "interface"
+        interface_callback()
 

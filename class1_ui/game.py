@@ -165,7 +165,7 @@ def game_loop(interface_callback,player,current_state):
             current_state = death(interface_callback,player)
         elif current_state == "level3":
             player.level = 3
-            current_state = run_level3(screen,player)
+            current_state = run_level3(screen,player,interface_callback)
 
         # applying brightness and sound settings in each loop iteration
         apply_brightness_and_sound(screen)
@@ -285,7 +285,8 @@ def execute_game(player, interface_callback=None):
         if enemy_cooldown <= 0:
             enemy = Enemy()
             enemies.add(enemy)
-            enemy_cooldown = fps * enemy.spawn_frequency  # Cooldown reset
+            enemy_cooldown = fps * enemy.spawn_frequency # Cooldown reset
+
         enemy_cooldown -= 1
 
         # Update all groups
@@ -338,7 +339,7 @@ def execute_game(player, interface_callback=None):
         if powerup is not None:
             # Check for collision with surprise
             if pygame.sprite.spritecollide(player, surprise, True):
-                powerup.affect_player(player,enemies)  # Apply the power-up
+                powerup.affect_player(player,enemy)  # Apply the power-up
                 # Only apply the power-up if it hasn't been used yet
                 if pup_count == 0:
                     pup_count +=1
@@ -366,6 +367,8 @@ def execute_game(player, interface_callback=None):
         if player.health <= 0:
             player.health = 100
             return "death"
+        if player.rect.x >= 10:
+            return "shed"
 
 
         # Apply brightness and sound settings dynamically

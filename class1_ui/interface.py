@@ -61,7 +61,7 @@ contains the main user interface logic:
                         # Restore game state
                         player = Player(save_data["health"],save_data["money"],save_data["state"],save_data["character"],save_data["type"])
                     else:
-                        player = Player(100,10,"main","img/female-removebg-preview.png","Girl") #as default character before its chosen
+                        player = Player(100,200,"main","img/female-removebg-preview.png","Girl") #as default character before its chosen
                     game_loop(interface,player,save_data["state"])
                     return
                 elif credits_hover.collidepoint(mouse):
