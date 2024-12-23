@@ -367,8 +367,7 @@ def execute_game(player, interface_callback=None):
         if player.health <= 0:
             player.health = 100
             return "death"
-        if player.rect.x >= 10:
-            return "shed"
+
 
 
         # Apply brightness and sound settings dynamically
